@@ -12,10 +12,10 @@ data = {
 # pip install marshmallow-dataclass
 
 from dataclasses import dataclass
+from typing import Annotated
 
 import marshmallow
 import marshmallow_dataclass
-from marshmallow_dataclass.typing import Annotated
 
 
 @dataclass
