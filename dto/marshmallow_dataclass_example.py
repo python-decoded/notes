@@ -28,7 +28,7 @@ class Address:
 class User:
     id: int
     name: str
-    birth_day: Annotated[str, marshmallow.fields.DateTime("timestamp")]
+    birth_day: Annotated[int, marshmallow.fields.DateTime("timestamp")]
     address: Address
 
 
