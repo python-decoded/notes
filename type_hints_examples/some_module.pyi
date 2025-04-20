@@ -1,0 +1,3 @@
+class Foo:
+    def create[T](self, a: T, b: T = ...) -> T:
+        ...
