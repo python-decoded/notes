@@ -26,5 +26,5 @@ with sqlite3.connect("my_database.db") as connection:
     rows = cursor.fetchall()
     print(*rows, sep="\n")
 
-    row = cursor.execute("SELECT * FROM Users WHERE username = ?", ("other", )).fetchmany()
+    row = cursor.execute("SELECT * FROM Users WHERE username = ?", ("other", )).fetchone()
     print("\n", row)
