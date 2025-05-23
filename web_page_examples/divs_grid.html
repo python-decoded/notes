@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .grid-container {
+              display: grid;
+              grid-template-columns: auto auto auto;
+              gap: 10px;
+              background-color: dodgerblue;
+              padding: 10px;
+            }
+
+            .grid-container > div {
+              background-color: #f1f1f1;
+              color:#000;
+              padding: 10px;
+              font-size: 30px;
+              text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div class="grid-container">
+
+            <div style="grid-column: 1 / span 2" class="item1">1</div>
+            <div style="grid-column: 3; grid-row: 1 / span 2;">2</div>
+            <div>3</div>
+
+            <div style="background-color: dodgerblue" class="grid-container">
+                <div style="grid-column: 1 / span 2" class="item1">A</div>
+                <div style="grid-column: 3; grid-row: 1 / span 2;">B</div>
+                <div>C</div>
+                <div>D</div>
+                <div style="grid-column: 1 / span 3">E</div>
+            </div>
+
+            <div style="grid-column: 1 / span 3">5</div>
+        </div>
+
+    </body>
+
+</html>
