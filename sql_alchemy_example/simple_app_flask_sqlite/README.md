@@ -1,0 +1,1 @@
+Simple and stupid usage of Flask + SQLite
