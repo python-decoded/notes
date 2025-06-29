@@ -1,0 +1,30 @@
+<div class="section experience">
+    <h2>Experience</h2>
+    {% for job in background %}
+    <div>
+        <h3>{{ job.company }}</h3>
+        <p>
+            <strong>From:</strong> {{ job.from.strftime('%b %Y') }} &nbsp;&nbsp;
+            <strong>To:</strong>
+            {% if job.to %}
+                {{ job.to.strftime('%b %Y') }}
+            {% else %}
+                Now
+            {% endif %}
+
+            &nbsp;&nbsp;
+            <strong>Duration:</strong> {{ job.from | duration(job.to | default(None)) }}
+        </p>
+
+        {% if job.duties %}
+        <ul>
+            {% for duty in job.duties %}
+            <li>{{ duty }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p><em>No duties listed.</em></p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
