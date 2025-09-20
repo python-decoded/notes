@@ -11,5 +11,3 @@ async def status():
 
 
 app.include_router(books.router, prefix="/books")
-
-
