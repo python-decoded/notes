@@ -1,0 +1,3 @@
+gooey
+pyinstaller
+pillow_heif
