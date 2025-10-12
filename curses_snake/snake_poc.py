@@ -28,6 +28,7 @@ class Game:
         if not self.snake_alive:
             return
 
+        # чи настав час змійці рухатись
         self.snake_sleep_time -= dt
         if self.snake_sleep_time > 0:
             return
@@ -36,23 +37,31 @@ class Game:
 
         head, *body = self.snake_segments
 
+        # де буде голова змійки?
         self.snake_dir = self.get_snake_new_dir()
         next_head = (head[0] + self.snake_dir[0],
                      head[1] + self.snake_dir[1])
 
+        # вийшла за край поля?
         in_field = (next_head[0] in range(self.field_width)
                     and next_head[1] in range(self.field_height))
         if not in_field:
             self.snake_alive = False
             return
 
+        # змійка робить крок
         self.snake_segments.insert(0, next_head)
+
+        # з'їла яблуко?
         if next_head == self.apple:
             self.apple = self.get_apple_new_position()
             self.snake_len += 1
             self.snake_move_timeout *= 0.9
 
+        # відкинути зайві сегменти відповідно до поточної довжини
         self.snake_segments = self.snake_segments[:self.snake_len]
+
+        # врізалась у власне тіло?
         if self.snake_segments[0] in self.snake_segments[1:]:
             self.snake_alive = False
 
