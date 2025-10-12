@@ -50,6 +50,7 @@ class Game:
         if next_head == self.apple:
             self.apple = self.get_apple_new_position()
             self.snake_len += 1
+            self.snake_move_timeout *= 0.9
 
         self.snake_segments = self.snake_segments[:self.snake_len]
         if self.snake_segments[0] in self.snake_segments[1:]:
@@ -81,7 +82,7 @@ class Game:
             self.act(dt)
             self.draw()
             prev_time = new_time
-            time.sleep(0.1)
+            time.sleep(0.05)  # FPS ~20
 
 
 if __name__ == "__main__":
