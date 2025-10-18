@@ -16,7 +16,7 @@ add_handlers(app)
 
 @app.get("/echo")
 async def echo():
-    return f"Message: {data}"
+    return "Test"
 
 
 
