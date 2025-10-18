@@ -1,7 +1,7 @@
 import json, uuid
 from typing import Annotated
 from starlette.datastructures import UploadFile as StarletteUploadFile
-from fastapi import FastAPI, Request, Path, Query, Header, Cookie, Body, Form, File, UploadFile,
+from fastapi import FastAPI, Request, Path, Query, Header, Cookie, Body, Form, File, UploadFile
 from fastapi.responses import JSONResponse
 from routers import books
 from core.handlers import add_handlers
