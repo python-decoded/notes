@@ -1,7 +1,9 @@
 import json
 from typing import Annotated
 from starlette.datastructures import UploadFile as StarletteUploadFile
-from fastapi import FastAPI, Request, Path, Query, Header, Cookie, Body, Form, File, UploadFile
+from fastapi import (FastAPI, Request, Path, Query, Header, Cookie, Body,
+                     Response, Form, File, UploadFile, Depends, Security)
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import JSONResponse
 from routers import books
 from core.handlers import add_handlers
@@ -11,62 +13,47 @@ app = FastAPI()
 add_handlers(app)
 
 
+async def get_user(
+        user_creds: Annotated[HTTPBasicCredentials, Security(HTTPBasic())],
+        res: Response
+) -> dict:
+    # Під'єднатись до бази даних і створити конекшн
+    res.headers["DI-HEADER"] = "Hi!!!!!"
+    yield {"user_name": user_creds.username,
+           "password": user_creds.password,
+           "user_age": 27}
+    # Закрити конекшн після обробки запиту
 
 
+@app.get("/echo/{something}")
+async def echo(req: Request,
+               user: Annotated[dict, Depends(get_user)],
+               res: Response,
+               param1: Annotated[str, Form()],
+               content_type: Annotated[str, Header()],
+               something: Annotated[str, Path(max_length=4)],
+               authorization: Annotated[str, Header()] = None,
+               req_body: Annotated[str, Body()] = None,
+               param2: Annotated[str, Form()] = None,
+               image: Annotated[UploadFile, File()] = None,
+               session_id: Annotated[str, Cookie()] = None,
+               foo: Annotated[int, Query(lt=100)] = 1):
 
-@app.get("/echo")
-async def echo():
-    return "Test"
+    res.headers["MAIN-HEADER"] = "Hi!!!!!"
 
+    url = req.url
+    path_params = {"something": something}
+    query_params = {"foo": foo}
+    method = req.method
+    headers = req.headers
+    body = await req.form()
+    body = {k: v for k, v in body.items()
+            if not isinstance(v, UploadFile)}
 
-
-
-
-
-
-
-
-
-
-
-
-# @app.get("/echo/{something}")
-# async def echo(req: Request,
-#                req_body: Annotated[str, Body(None)],
-#                param1: Annotated[str, Form(...)],
-#                param2: Annotated[str, Form(None)],
-#                image: Annotated[UploadFile, File(None)],
-#                content_type: Annotated[str, Header("content-type")],
-#                session_id: Annotated[str, Cookie(None)],
-#                something: Annotated[str, Path(..., max_length=4)],
-#                foo: Annotated[int, Query(1, lt=100)]):
-#
-#     url = req.url
-#     path_params = {"something": something}
-#     query_params = {"foo": foo}
-#     # method = req.method
-#     # headers = req.headers
-#     # body = await req.form()
-#     # file = body["image"]
-#     # body = {k: v for k, v in body.items()
-#     #         if not isinstance(v, UploadFile)}
-#     #
-#     # return {"url": url, "path_params": path_params,
-#     #         "query_params": query_params, "method": method,
-#     #         "headers": headers, "body": body, "file": file.filename}
-#     #
-#
-#     return {"session_id": session_id, "contnet_type": content_type, "image": image}
-
-
-
-
-
-
-
-
-
-
+    return {"url": url, "path_params": path_params,
+            "query_params": query_params, "method": method,
+            "headers": headers, "body": body, "file": image and image.filename,
+            "user": user, "auth": authorization}
 
 
 # @app.middleware("http")
