@@ -1,15 +1,26 @@
 import json
 from typing import Annotated
-from starlette.datastructures import UploadFile as StarletteUploadFile
 from fastapi import (FastAPI, Request, Path, Query, Header, Cookie, Body,
                      Response, Form, File, UploadFile, Depends, Security)
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import JSONResponse
 from routers import books
 from core.handlers import add_handlers
+from contextlib import asynccontextmanager
+from core.db import init_db, drop_db, AsyncSessionLocal
 
 
-app = FastAPI()
+@asynccontextmanager
+async def app_setup(app: FastAPI):
+    async with AsyncSessionLocal() as session:
+        await init_db(session)
+
+    yield
+
+    await drop_db()
+
+
+app = FastAPI(lifespan=app_setup)
 add_handlers(app)
 
 
