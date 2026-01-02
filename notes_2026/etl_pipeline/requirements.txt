@@ -1,0 +1,13 @@
+# взаємодія з ютуб апі
+pydantic
+google-api-python-client
+
+# llm модель
+transformers
+torch
+sentencepiece
+protobuf
+
+# збереження у ексель
+pandas
+openpyxl
