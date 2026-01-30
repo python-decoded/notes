@@ -1,4 +1,4 @@
-import socket, multiprocessing
+import time, multiprocessing, socket
 
 
 HOST = "127.0.0.1"
@@ -10,7 +10,7 @@ def child_process():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.bind((HOST, PORT))
         sock.listen()
-        print("[server] listening...")
+        print(f"[server] listening port {PORT} ...\n")
 
         while True:
             conn, addr = sock.accept()
@@ -22,7 +22,26 @@ def child_process():
                 conn.sendall(b"Hello from server")
 
 
+# parent process
 if __name__ == "__main__":
+
     p = multiprocessing.Process(target=child_process)
     p.start()
-    ...
+
+    time.sleep(5)
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.connect((HOST, PORT))
+        sock.sendall(b"Hello from client")
+        data = sock.recv(1024)
+        print("[client] received:", data.decode())
+
+    time.sleep(5)
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.connect((HOST, PORT))
+        sock.sendall(b"Hello from client 2")
+        data = sock.recv(1024)
+        print("[client] received:", data.decode())
+
+    p.terminate()
