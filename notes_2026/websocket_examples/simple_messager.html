@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Global Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    #chat {
+      width: 400px;
+      background: #fff;
+      border: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .msg {
+      margin-bottom: 6px;
+    }
+
+    #input-area {
+      display: flex;
+      padding: 10px;
+      gap: 6px;
+    }
+
+    #messageInput {
+      flex: 1;
+      padding: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="chat">
+  <div id="messages"></div>
+
+  <div id="input-area">
+    <input id="messageInput" placeholder="Напиши повідомлення..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+  const userName = prompt("Введи своє імʼя:", "") || "unknown";
+
+  const messagesDiv = document.getElementById("messages");
+  const input = document.getElementById("messageInput");
+
+  function addMessage(text) {
+    const div = document.createElement("div");
+
+    div.className = "msg";
+    div.innerHTML = text;
+
+    if (text.startsWith(userName + ":")) {
+      div.style.color = "blue";
+      div.style.fontWeight = "bold";
+      div.style.textAlign = "right";
+    }
+
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  const ws = new WebSocket(`ws://localhost:8000/websocket/${userName}`);
+
+  ws.onmessage = (event) => {
+    addMessage(event.data);
+  };
+
+  function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    ws.send(text);
+    addMessage(`${userName}: ${text}`);
+
+    input.value = "";
+  }
+
+</script>
+
+</body>
+
+</html>
