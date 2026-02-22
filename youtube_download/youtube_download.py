@@ -1,6 +1,8 @@
 from pathlib import Path
 from urllib.request import urlopen
+
 from pytubefix import YouTube
+import yt_dlp
 from gooey import Gooey, GooeyParser
 
 
@@ -13,10 +15,27 @@ def get_description(url):
 
 
 def download_video(url, path):
-    stream = YouTube(url).streams.get_highest_resolution()
-    stream.download(output_path=path,
-                    skip_existing=True,
-                    max_retries=3)
+
+    try:
+        ydl_opts = {
+            'outtmpl': f'{path}/%(title)s.%(ext)s',
+            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best',
+            'merge_output_format': 'mp4',
+        }
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+
+    except yt_dlp.utils.DownloadError as e:
+        print(f"Не зміг завантажити відео найкращої якості задопомогою yt_dlp: {e}")
+        if "ffmpeg is not installed" in str(e):
+            print("\nДля коректної роботи yt_dlp потрібно встановити кодек 'ffmpeg'. Деталі: 'https://www.ffmpeg.org'.")
+        print("Завантаження буде виконане бібліотекою pytubefix, що не дає найкращу якість.")
+
+        stream = YouTube(url).streams.get_highest_resolution()
+        stream.download(output_path=path,
+                        skip_existing=True,
+                        max_retries=3)
 
 
 def download_audio(url, path):

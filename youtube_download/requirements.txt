@@ -1,3 +1,4 @@
 pytubefix
 gooey
 pyinstaller
+yt-dlp
