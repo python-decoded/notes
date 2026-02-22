@@ -39,10 +39,31 @@ def download_video(url, path):
 
 
 def download_audio(url, path):
-    stream = YouTube(url).streams.get_audio_only()
-    stream.download(output_path=path,
-                    skip_existing=True,
-                    max_retries=3)
+
+    try:
+        ydl_opts = {
+            'outtmpl': f'{path}/%(title)s.%(ext)s',
+            'format': 'bestaudio/best',
+            'noplaylist': True,
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',  # 128 / 192 / 320
+            }],
+        }
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+    except Exception as e:
+        print(f"Не вдалося вивантажити аудіо у форматі mp3 задопомогою yt_dlp, {e}")
+        if "ffmpeg is not installed" in str(e):
+            print("\nДля коректної роботи yt_dlp потрібно встановити кодек 'ffmpeg'. Деталі: 'https://www.ffmpeg.org'.")
+        print("Завантаження буде виконане бібліотекою pytubefix, зазвичай у форматі m4a.")
+
+        stream = YouTube(url).streams.get_audio_only()
+        stream.download(output_path=path,
+                        skip_existing=True,
+                        max_retries=3)
 
 
 def download_info(url, path):
