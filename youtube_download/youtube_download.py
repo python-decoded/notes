@@ -81,7 +81,7 @@ def download_thumbnail(url, path):
             image.write(response.read())
 
 
-@Gooey(program_name="Youtube Downloader",
+@Gooey(program_name="Youtube Downloader v1.1.0",
        default_size=(500, 600),
        clear_before_run=True)
 def main():
