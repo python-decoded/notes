@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Query
@@ -32,18 +33,20 @@ connect_args = {"check_same_thread": False}
 engine = create_engine("sqlite:///database.db", connect_args=connect_args)
 
 
+@asynccontextmanager
+def lifespan(_):
+    Base.metadata.create_all(bind=engine)
+    yield
+
+
 def get_session():
     with Session(engine) as session:
         yield session
 
 
 SessionDep = Annotated[Session, Depends(get_session)]
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
-
-@app.on_event("startup")
-def on_startup():
-    Base.metadata.create_all(bind=engine)
 
 # ============================================================================
 
