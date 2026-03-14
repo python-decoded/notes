@@ -21,14 +21,6 @@ class DBUser(Base):
     secret = Column(String)
 
 
-class User(BaseModel):
-
-    id: int | None = Field(default=None)
-    name: str
-    age: int | None = Field(default=None)
-    secret: str
-
-
 connect_args = {"check_same_thread": False}
 engine = create_engine("sqlite:///database.db", connect_args=connect_args)
 
@@ -48,7 +40,13 @@ SessionDep = Annotated[Session, Depends(get_session)]
 app = FastAPI(lifespan=lifespan)
 
 
-# ============================================================================
+class User(BaseModel):
+
+    id: int | None = Field(default=None)
+    name: str
+    age: int | None = Field(default=None)
+    secret: str
+
 
 @app.get("/users", response_model=list[User])
 def read_users(
