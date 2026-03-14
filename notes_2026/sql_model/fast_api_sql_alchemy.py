@@ -3,20 +3,21 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy import Column, Integer, String, create_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Session
 
 
-Base = declarative_base()
+class Base(DeclarativeBase):
+    pass
 
 
 class DBUser(Base):
     __tablename__ = "user"
 
-    id: int | None = Column(Integer, primary_key=True, index=True)
-    name: str = Column(String, index=True)
-    age: int | None = Column(Integer, nullable=True)
-    secret: str = Column(String)
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    age = Column(Integer, nullable=True)
+    secret = Column(String)
 
 
 class User(BaseModel):
@@ -51,7 +52,7 @@ def read_users(
     session: SessionDep,
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
-):
+) -> list[DBUser]:
     db_users = session.query(DBUser).offset(offset).limit(limit).all()
     return db_users
 
