@@ -26,7 +26,7 @@ engine = create_engine("sqlite:///database.db", connect_args=connect_args)
 
 
 @asynccontextmanager
-def lifespan(_):
+async def lifespan(_):
     Base.metadata.create_all(bind=engine)
     yield
 
