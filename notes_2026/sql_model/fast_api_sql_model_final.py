@@ -5,12 +5,26 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlmodel import Field, Session, SQLModel, create_engine
 
 
+class UserCreate(SQLModel):
+
+    name: str = Field(index=True)
+    age: int | None = Field(default=None, index=True)
+    secret: str
+
+
 class User(SQLModel, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(index=True)
     age: int | None = Field(default=None, index=True)
     secret: str
+
+
+class UserPublic(SQLModel):
+
+    id: int | None = Field(default=None, primary_key=True)
+    name: str = Field(index=True)
+    age: int | None = Field(default=None, index=True)
 
 
 connect_args = {"check_same_thread": False}
@@ -36,7 +50,7 @@ app = FastAPI(lifespan=lifespan)
 
 
 
-@app.get("/users")
+@app.get("/users", response_model=list[UserPublic])
 def read_users(
     session: SessionDep,
     offset: int = 0,
@@ -46,15 +60,16 @@ def read_users(
     return users
 
 
-@app.post("/users")
-def create_user(user: User, session: SessionDep) -> User:
-    session.add(user)
+@app.post("/users", response_model=UserPublic)
+def create_user(user: UserCreate, session: SessionDep) -> User:
+    user_db = User.model_validate(user)
+    session.add(user_db)
     session.commit()
-    session.refresh(user)
-    return user
+    session.refresh(user_db)
+    return user_db
 
 
-@app.get("/users/{user_id}")
+@app.get("/users/{user_id}", response_model=UserPublic)
 def read_user(user_id: int, session: SessionDep) -> User:
     user = session.get(User, user_id)
     if not user:
