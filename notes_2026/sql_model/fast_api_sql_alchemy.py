@@ -59,8 +59,8 @@ def read_users(
 
 
 @app.post("/users", response_model=User)
-def create_user(hero: User, session: SessionDep) -> DBUser:
-    db_user = DBUser(**hero.model_dump())
+def create_user(user: User, session: SessionDep) -> DBUser:
+    db_user = DBUser(**user.model_dump())
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
