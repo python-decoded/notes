@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Query
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Field, Session, SQLModel, create_engine
 
 
 class User(SQLModel, table=True):
@@ -18,8 +18,8 @@ engine = create_engine("sqlite:///database.db", connect_args=connect_args)
 
 
 @asynccontextmanager
-def lifespan(_):
-    Base.metadata.create_all(bind=engine)
+async def lifespan(_):
+    SQLModel.metadata.create_all(bind=engine)
     yield
 
 
@@ -32,16 +32,13 @@ SessionDep = Annotated[Session, Depends(get_session)]
 app = FastAPI(lifespan=lifespan)
 
 
-# ============================================================================
-
-
-@app.get("/users", response_model=list[User])
+@app.get("/users")
 def read_users(
     session: SessionDep,
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
-):
-    users = session.exec(select(User).offset(offset).limit(limit)).all()
+) -> list[User]:
+    users = session.query(User).offset(offset).limit(limit).all()
     return users
 
 
