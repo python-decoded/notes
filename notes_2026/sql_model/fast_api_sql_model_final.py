@@ -5,26 +5,22 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlmodel import Field, Session, SQLModel, create_engine
 
 
-class UserCreate(SQLModel):
-
+class UserBase(SQLModel):
     name: str = Field(index=True)
     age: int | None = Field(default=None, index=True)
+
+
+class UserCreate(UserBase):
     secret: str
 
 
-class User(SQLModel, table=True):
-
+class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    name: str = Field(index=True)
-    age: int | None = Field(default=None, index=True)
     secret: str
 
 
-class UserPublic(SQLModel):
-
-    id: int | None = Field(default=None, primary_key=True)
-    name: str = Field(index=True)
-    age: int | None = Field(default=None, index=True)
+class UserPublic(UserBase):
+    id: int
 
 
 connect_args = {"check_same_thread": False}
@@ -44,10 +40,6 @@ def get_session():
 
 SessionDep = Annotated[Session, Depends(get_session)]
 app = FastAPI(lifespan=lifespan)
-
-
-
-
 
 
 @app.get("/users", response_model=list[UserPublic])
