@@ -1,0 +1,64 @@
+2026-04-15 18:06:46,955 [INFO] [processors.user] Start processing user 1
+2026-04-15 18:06:46,955 [ERROR] [processors.user] User 1: error occurred: Something went wrong!
+2026-04-15 18:06:46,956 [INFO] [processors.user] Start processing user 2
+2026-04-15 18:06:46,956 [DEBUG] [processors.user] User 2: normal processing
+2026-04-15 18:06:47,502 [INFO] [processors.user] User 2: processed successfully
+2026-04-15 18:06:47,502 [INFO] [processors.user] Start processing user 3
+2026-04-15 18:06:47,503 [DEBUG] [processors.user] User 3: normal processing
+2026-04-15 18:06:48,004 [INFO] [processors.user] User 3: processed successfully
+2026-04-15 18:06:48,004 [INFO] [processors.user] Start processing user 4
+2026-04-15 18:06:48,004 [ERROR] [processors.user] User 4: error occurred: Something went wrong!
+2026-04-15 18:06:48,006 [INFO] [processors.user] Start processing user 5
+2026-04-15 18:06:48,006 [ERROR] [processors.user] User 5: error occurred: Something went wrong!
+2026-04-15 18:06:49,738 [DEBUG] [urllib3.connectionpool] Starting new HTTPS connection (1): swapi.dev:443
+2026-04-15 18:06:50,030 [DEBUG] [urllib3.connectionpool] https://swapi.dev:443 "GET /api/people/1/?format=json HTTP/1.1" 200 None
+2026-04-15 18:24:06,319 [INFO] [processors.user] Start processing user 1
+2026-04-15 18:24:06,322 [DEBUG] [processors.user] User 1: normal processing
+2026-04-15 18:24:06,823 [INFO] [processors.user] User 1: processed successfully
+2026-04-15 18:24:06,823 [INFO] [processors.user] Start processing user 2
+2026-04-15 18:24:06,824 [WARNING] [processors.user] User 2: slow response detected
+2026-04-15 18:24:08,325 [INFO] [processors.user] User 2: processed with delay
+2026-04-15 18:24:08,325 [INFO] [processors.user] Start processing user 3
+2026-04-15 18:24:08,325 [DEBUG] [processors.user] User 3: normal processing
+2026-04-15 18:24:08,826 [INFO] [processors.user] User 3: processed successfully
+2026-04-15 18:24:08,826 [INFO] [processors.user] Start processing user 4
+2026-04-15 18:24:08,826 [DEBUG] [processors.user] User 4: normal processing
+2026-04-15 18:24:09,327 [INFO] [processors.user] User 4: processed successfully
+2026-04-15 18:24:09,327 [INFO] [processors.user] Start processing user 5
+2026-04-15 18:24:09,327 [DEBUG] [processors.user] User 5: normal processing
+2026-04-15 18:24:09,828 [INFO] [processors.user] User 5: processed successfully
+2026-04-15 18:24:13,175 [DEBUG] [urllib3.connectionpool] Starting new HTTPS connection (1): swapi.dev:443
+2026-04-15 18:24:13,453 [DEBUG] [urllib3.connectionpool] https://swapi.dev:443 "GET /api/people/1/?format=json HTTP/1.1" 200 None
+{"asctime": "2026-04-15 19:14:34,106", "name": "processors.user", "level": "INFO", "module": "user", "message": "Start processing user 1", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-15 19:14:34,106", "name": "processors.user", "level": "ERROR", "module": "user", "message": "User 1: error occurred: Something went wrong!", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-15 19:14:34,106", "name": "processors.user", "level": "INFO", "module": "user", "message": "Start processing user 2", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-15 19:14:34,106", "name": "processors.user", "level": "DEBUG", "module": "user", "message": "User 2: normal processing", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-15 19:14:34,607", "name": "processors.user", "level": "INFO", "module": "user", "message": "User 2: processed successfully", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-15 19:14:34,607", "name": "processors.user", "level": "INFO", "module": "user", "message": "Start processing user 3", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-15 19:14:34,607", "name": "processors.user", "level": "WARNING", "module": "user", "message": "User 3: slow response detected", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-15 19:14:36,108", "name": "processors.user", "level": "INFO", "module": "user", "message": "User 3: processed with delay", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-15 19:14:36,108", "name": "processors.user", "level": "INFO", "module": "user", "message": "Start processing user 4", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-15 19:14:36,108", "name": "processors.user", "level": "ERROR", "module": "user", "message": "User 4: error occurred: Something went wrong!", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-15 19:14:36,108", "name": "processors.user", "level": "INFO", "module": "user", "message": "Start processing user 5", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-15 19:14:36,109", "name": "processors.user", "level": "WARNING", "module": "user", "message": "User 5: slow response detected", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-15 19:14:37,610", "name": "processors.user", "level": "INFO", "module": "user", "message": "User 5: processed with delay", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-15 19:14:38,417", "name": "urllib3.connectionpool", "level": "DEBUG", "module": "connectionpool", "message": "Starting new HTTPS connection (1): swapi.dev:443", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-15 19:14:38,671", "name": "urllib3.connectionpool", "level": "DEBUG", "module": "connectionpool", "message": "https://swapi.dev:443 \"GET /api/people/1/?format=json HTTP/1.1\" 200 None", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:19,565", "name": "__main__", "level": "INFO", "module": "main", "message": "Application started", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:19,585", "name": "processors.user", "level": "INFO", "module": "user", "message": "Start processing user 1", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:19,586", "name": "processors.user", "level": "DEBUG", "module": "user", "message": "User 1: normal processing", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:20,086", "name": "processors.user", "level": "INFO", "module": "user", "message": "User 1: processed successfully", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:20,086", "name": "processors.user", "level": "INFO", "module": "user", "message": "Start processing user 2", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:20,086", "name": "processors.user", "level": "ERROR", "module": "user", "message": "User 2: error occurred: Something went wrong!", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:20,087", "name": "processors.user", "level": "INFO", "module": "user", "message": "Start processing user 3", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:20,087", "name": "processors.user", "level": "DEBUG", "module": "user", "message": "User 3: normal processing", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:20,588", "name": "processors.user", "level": "INFO", "module": "user", "message": "User 3: processed successfully", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:20,588", "name": "processors.user", "level": "INFO", "module": "user", "message": "Start processing user 4", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:20,588", "name": "processors.user", "level": "WARNING", "module": "user", "message": "User 4: slow response detected", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:22,089", "name": "processors.user", "level": "INFO", "module": "user", "message": "User 4: processed with delay", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:22,089", "name": "processors.user", "level": "INFO", "module": "user", "message": "Start processing user 5", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:22,089", "name": "processors.user", "level": "DEBUG", "module": "user", "message": "User 5: normal processing", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:22,590", "name": "processors.user", "level": "INFO", "module": "user", "message": "User 5: processed successfully", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:22,590", "name": "__main__", "level": "INFO", "module": "main", "message": "Application finished", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:24,931", "name": "urllib3.connectionpool", "level": "DEBUG", "module": "connectionpool", "message": "Starting new HTTPS connection (1): swapi.dev:443", "version": "1.34.12", "environment": "production"}
+{"asctime": "2026-04-16 13:24:25,168", "name": "urllib3.connectionpool", "level": "DEBUG", "module": "connectionpool", "message": "https://swapi.dev:443 \"GET /api/people/1/?format=json HTTP/1.1\" 200 None", "version": "1.34.12", "environment": "production"}

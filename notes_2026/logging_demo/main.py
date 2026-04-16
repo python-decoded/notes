@@ -1,16 +1,7 @@
 import logging
 
+from logging_setup import setup_root_logger
 from processors.user import process_user
-
-
-logging.basicConfig(
-    level=logging.WARN,
-    format="%(asctime)s [%(levelname)s] [%(name)s] %(message)s",
-    handlers=[
-        logging.FileHandler("app.log"),
-        logging.StreamHandler()
-    ]
-)
 
 logger = logging.getLogger(__name__)
 
@@ -25,4 +16,8 @@ def main():
 
 
 if __name__ == "__main__":
+    setup_root_logger()
     main()
+
+    import requests
+    requests.get("https://swapi.dev/api/people/1/?format=json")

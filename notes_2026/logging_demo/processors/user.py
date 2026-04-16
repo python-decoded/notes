@@ -5,7 +5,6 @@ import time
 
 logger = logging.getLogger(__name__)
 
-
 def process_user(user_id: int):
     logger.info(f"Start processing user {user_id}")
 
