@@ -1,30 +1,20 @@
 import time
-import random
 import curses
 
 
-class Game:
-
-    def __init__(self, stdscr: curses.window):
+class Level:
+    def __init__(self, stdscr: curses.window, width, height, player, walls, boxes, buttons):
         self.stdscr = stdscr
 
-        self.field_width = 10
-        self.field_height = 6
-        self.snake_len = 5
-        self.snake_segments = [(0, 0)] * self.snake_len
-        self.snake_dir = (1, 0)  # вправо
-        self.snake_move_timeout = 1  # 1 крок на сек
-        self.snake_sleep_time = 2  # сек.
-        self.snake_alive = True
-        self.apple = (3, 0)
+        self.field_width = width
+        self.field_height = height
 
-    def get_apple_new_position(self):
-        cells = {(x, y) for x in range(self.field_width)
-                 for y in range(self.field_height)}
-        cells -= set(self.snake_segments)
-        return random.choice(list(cells))
+        self.player_pos = player
+        self.walls = walls
+        self.boxes = boxes
+        self.buttons = buttons
 
-    def get_snake_new_dir(self):
+    def get_new_dir(self) -> tuple[int, int] | None:
 
         key = self.stdscr.getch()  # отримати натиснуту клавішу
         directions = {
@@ -33,70 +23,77 @@ class Game:
             curses.KEY_UP: (0, -1),
             curses.KEY_DOWN: (0, 1)
         }
-        return directions.get(key, self.snake_dir)
+        return directions.get(key)
 
     def act(self, dt):
-        if not self.snake_alive:
+        # якщо кнопки співпадають з ящиками - виграв
+        if set(self.buttons) <= set(self.boxes):
+            # todo запустити наступний рівень
             return
 
-        # чи настав час змійці рухатись
-        self.snake_sleep_time -= dt
-        if self.snake_sleep_time > 0:
+        # якщо натиснута клавіша клавіатури
+        shift = self.get_new_dir()
+        if shift is None:
             return
 
-        self.snake_sleep_time += self.snake_move_timeout
+        # вирахувати на яку клітину переміститься гравець
+        dx, dy = shift
+        player_new_position = self.player_pos[0] + dx, self.player_pos[1] + dy
 
-        head, *body = self.snake_segments
-
-        # де буде голова змійки?
-        self.snake_dir = self.get_snake_new_dir()
-        next_head = (head[0] + self.snake_dir[0],
-                     head[1] + self.snake_dir[1])
-
-        # вийшла за край поля?
-        in_field = (next_head[0] in range(self.field_width)
-                    and next_head[1] in range(self.field_height))
-        if not in_field:
-            self.snake_alive = False
+        #     це в межах поля ?
+        if player_new_position[0] not in range(self.field_width):
+            return
+        if player_new_position[1] not in range(self.field_height):
+            return
+        if player_new_position in self.walls:
             return
 
-        # змійка робить крок
-        self.snake_segments.insert(0, next_head)
+        if player_new_position in self.boxes:
+            box_new_position = player_new_position[0] + dx, player_new_position[1] + dy
+            if box_new_position[0] not in range(self.field_width):
+                return
+            if box_new_position[1] not in range(self.field_height):
+                return
+            if box_new_position in self.walls:
+                return
+            if box_new_position in self.boxes:
+                return
 
-        # з'їла яблуко?
-        if next_head == self.apple:
-            self.apple = self.get_apple_new_position()
-            self.snake_len += 1
-            self.snake_move_timeout *= 0.9
+            # рухаємо ящик - якщо треба
+            self.boxes.remove(player_new_position)
+            self.boxes.append(box_new_position)
 
-        # відкинути зайві сегменти відповідно до поточної довжини
-        self.snake_segments = self.snake_segments[:self.snake_len]
-
-        # врізалась у власне тіло?
-        if self.snake_segments[0] in self.snake_segments[1:]:
-            self.snake_alive = False
+        # рухаємо гравця
+        self.player_pos = player_new_position
 
     def draw(self):
 
         field = [[" . "] * self.field_width
                  for _ in range(self.field_height)]
-        apple_x, apple_y = self.apple
-        field[apple_y][apple_x] = " @ "
+        for wall in self.walls:
+            field[wall[1]][wall[0]] = "###"
+        for button in self.buttons:
+            field[button[1]][button[0]] = " o "
+        for box in self.boxes:
+            field[box[1]][box[0]] = "|X|"
 
-        snake_head, *snake_body = self.snake_segments
-        for x, y in snake_body:
-            field[y][x] = " o "
-
-        field[snake_head[1]][snake_head[0]] = " * " if self.snake_alive else " x "
+        field[self.player_pos[1]][self.player_pos[0]] = "^_^"
 
         for y, row in enumerate(field, start=5):
             for x, ch in enumerate("".join(row), start=5):
-                if ch in "xo*":
-                    self.stdscr.addstr(y, x, ch, curses.color_pair(1))
-                elif ch in "@":
-                    self.stdscr.addstr(y, x, ch, curses.color_pair(2))
-                else:
-                    self.stdscr.addstr(y, x, ch)
+                # if ch in "xo*":
+                #     self.stdscr.addstr(y, x, ch, curses.color_pair(1))
+                # elif ch in "@":
+                #     self.stdscr.addstr(y, x, ch, curses.color_pair(2))
+                # else:
+                self.stdscr.addstr(y, x, ch)
+
+
+class Game:
+
+    def __init__(self, stdscr: curses.window):
+        self.stdscr = stdscr
+        self.level = Level(stdscr)
 
     def run(self):
 
@@ -112,8 +109,8 @@ class Game:
             new_time = time.time()
             dt = new_time - prev_time
             self.stdscr.clear()
-            self.act(dt)
-            self.draw()
+            self.level.act(dt)
+            self.level.draw()
             self.stdscr.refresh()
             prev_time = new_time
             time.sleep(0.05)  # FPS ~20
