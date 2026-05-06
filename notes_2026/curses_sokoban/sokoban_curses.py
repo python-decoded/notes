@@ -1,10 +1,50 @@
 import time
 import curses
+from copy import deepcopy
+
+LEVELS = [
+    {
+        "width": 6, "height": 6, "player": (1, 1),
+        "walls": [
+            (0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0),
+            (0, 1), (5, 1), (0, 2), (3, 2), (5, 2),
+            (0, 3), (5, 3), (0, 4), (5, 4),
+            (0, 5), (1, 5), (2, 5), (3, 5), (4, 5), (5, 5)
+        ],
+        "boxes": [(2, 2)],
+        "buttons": [(4, 3)]
+    },
+    {
+        "width": 7, "height": 7,  "player": (3, 2),
+        "walls": [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (0, 1), (4, 1),
+                  (0, 2), (4, 2), (5, 2), (6, 2), (0, 3), (6, 3),
+                  (0, 4), (6, 4), (0, 5), (4, 5), (5, 5), (6, 5),
+                  (0, 6), (1, 6), (2, 6), (3, 6)],
+        "boxes": [(3, 3), (4, 3)],
+        "buttons": [(2, 4), (3, 1)]
+    },
+    {
+        "width": 13, "height": 9, "player": (7, 5),
+        "walls": [(1, 0), (2, 0), (3, 0), (6, 0), (7, 0), (8, 0), (9, 0),
+                  (1, 1), (3, 1), (4, 1), (5, 1), (6, 1), (9, 1), (10, 1),
+                  (1, 2), (9, 2), (1, 3), (3, 3), (4, 3), (5, 3), (9, 3), (12, 4),
+                  (0, 4), (1, 4), (5, 4), (6, 4), (7, 4), (9, 4), (10, 4), (11, 4),
+                  (0, 5), (12, 5), (0, 6), (4, 6), (5, 6), (7, 6), (9, 6), (10, 6), (12, 6),
+                  (0, 7), (2, 7), (3, 7), (4, 7), (5, 7), (12, 7), (0, 8), (1, 8), (2, 8),
+                  (5, 8), (6, 8), (7, 8), (8, 8), (9, 8), (10, 8), (11, 8), (12, 8)],
+        "boxes": [(3, 2)],
+        "buttons": [(1, 7)]
+    }
+]
 
 
 class Level:
-    def __init__(self, stdscr: curses.window, width, height, player, walls, boxes, buttons):
+    def __init__(self, stdscr: curses.window, width, height, player, walls, boxes, buttons,
+                 start_level_func: callable, level_num: int):
+
         self.stdscr = stdscr
+        self.start_level_func = start_level_func
+        self.level_num = level_num
 
         self.field_width = width
         self.field_height = height
@@ -23,12 +63,17 @@ class Level:
             curses.KEY_UP: (0, -1),
             curses.KEY_DOWN: (0, 1)
         }
+        if key == ord("r"):
+            self.start_level_func(self.level_num)
+            return
+
         return directions.get(key)
 
     def act(self, dt):
+
         # якщо кнопки співпадають з ящиками - виграв
         if set(self.buttons) <= set(self.boxes):
-            # todo запустити наступний рівень
+            self.start_level_func(self.level_num + 1)
             return
 
         # якщо натиснута клавіша клавіатури
@@ -91,9 +136,19 @@ class Level:
 
 class Game:
 
+    level: Level
+
     def __init__(self, stdscr: curses.window):
         self.stdscr = stdscr
-        self.level = Level(stdscr)
+        self.start_level(0)
+
+    def start_level(self, idx):
+        if idx >= len(LEVELS):
+            print("Ви пройшли усі рівні, вітаю!!!")
+            exit()
+
+        level_data = deepcopy(LEVELS[idx])
+        self.level = Level(self.stdscr, **level_data, start_level_func=self.start_level, level_num=idx)
 
     def run(self):
 
