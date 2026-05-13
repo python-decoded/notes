@@ -182,7 +182,7 @@ def process_video(url, args):
        clear_before_run=True)
 def main():
     parser = GooeyParser()
-    parser.add_argument("url", action="store", help="Provide url of video, playlist or channel.", metavar="Url")
+    parser.add_argument("url", action="store", help="Url of video, playlist or channel.", metavar="Url")
     parser.add_argument("download_dir", widget="DirChooser",
                         action="store", help="Where to save video",
                         metavar="Select Path")
