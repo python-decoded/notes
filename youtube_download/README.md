@@ -11,3 +11,16 @@ pyinstaller --onefile --noconsole --python-option "X utf8=1" .\youtube_download.
 ```shell
 choco install ffmpeg
 ```
+
+
+## Типи підтримуваних урл
+Застосунок підтримує завантаження одного відео, плейліста, усіх відео з каналу.
+
+Приклади очікуваного формату урл:
+
+Відео:
+https://www.youtube.com/watch?v=tge4ojz5w1w
+Плейліст:
+https://www.youtube.com/playlist?list=PLAMUEkIlR-Va7SZL-DeGRWYepYZa6rehF
+Канал:
+https://www.youtube.com/@python_decoded/videos
