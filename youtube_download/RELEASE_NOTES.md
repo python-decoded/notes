@@ -1,3 +1,6 @@
+## Version 1.2.1
+- Fix UnicodeEncodeError on print of video title
+
 ## Version 1.2.0
 - Supports download of videos from playlist (all or specified by indexes).
 - Supports download of all videos from chanel (all or specified by indexes).

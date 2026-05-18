@@ -1,3 +1,5 @@
+import sys
+import io
 from pathlib import Path
 from urllib.request import urlopen
 from functools import lru_cache
@@ -5,6 +7,8 @@ from functools import lru_cache
 from pytubefix import YouTube, Playlist
 import yt_dlp
 from gooey import Gooey, GooeyParser
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 
 def is_playlist(url):
@@ -119,8 +123,8 @@ def download_audio(url, path):
 
 def download_info(url, path):
     file_name = get_title(url) + ".txt"
-    with open(Path(path) / file_name, "wb") as file:
-        file.write(f"{get_title(url)}\n\n{get_description(url)}".encode("utf-8"))
+    with open(Path(path) / file_name, "w", encoding='utf-8') as file:
+        file.write(f"{get_title(url)}\n\n{get_description(url)}")
 
 
 def download_thumbnail(url, path):
@@ -177,7 +181,7 @@ def process_video(url, args):
         download_info(url, args.download_dir)
 
 
-@Gooey(program_name="Youtube Downloader v1.2.0",
+@Gooey(program_name="Youtube Downloader v1.2.1",
        default_size=(500, 600),
        clear_before_run=True)
 def main():
