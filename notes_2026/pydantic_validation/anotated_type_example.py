@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, Field, AfterValidator
+from pydantic import BaseModel, Field, AfterValidator, BeforeValidator
 
 import annotated_types
 from typing import Annotated
@@ -16,9 +16,19 @@ def check_18_plus(v: datetime) -> datetime:
     return v
 
 
+def csv_to_list(data: list | str) -> list:
+    if isinstance(data, str):
+        data = data.split(",")
+    return data
+
+
 class MyClass(BaseModel):
     value: PositiveInt
     birth_date: Annotated[datetime, AfterValidator(check_18_plus)]
+    tags: Annotated[list, BeforeValidator(csv_to_list)] = Field(default_factory=list)
 
 
-MyClass(value=10, birth_date="2016-04-25")
+obj = MyClass(value=10, birth_date="2000-04-25", tags="tag1,tag2,tag3")
+
+for tag in obj.tags:
+    print(tag)
