@@ -1,9 +1,7 @@
-from datetime import datetime
-from pydantic import BaseModel, Field, AfterValidator, BeforeValidator
-
-import annotated_types
 from typing import Annotated
-PositiveInt = Annotated[int, Field(gt=0, le=100, multiple_of=5)]
+from datetime import datetime
+
+from pydantic import BaseModel, Field, AfterValidator, BeforeValidator
 
 
 def check_18_plus(v: datetime) -> datetime:
@@ -23,12 +21,11 @@ def csv_to_list(data: list | str) -> list:
 
 
 class MyClass(BaseModel):
-    value: PositiveInt
     birth_date: Annotated[datetime, AfterValidator(check_18_plus)]
     tags: Annotated[list, BeforeValidator(csv_to_list)] = Field(default_factory=list)
 
 
-obj = MyClass(value=10, birth_date="2000-04-25", tags="tag1,tag2,tag3")
+obj = MyClass(birth_date="2000-04-25", tags="tag1,tag2,tag3")
 
 for tag in obj.tags:
     print(tag)
