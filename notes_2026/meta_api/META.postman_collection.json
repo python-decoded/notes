@@ -1571,7 +1571,7 @@
   "variable": [
     {
       "key": "fb",
-      "value": ""
+      "value": "https://graph.facebook.com/v25.0"
     },
     {
       "key": "app_id",
@@ -1587,7 +1587,7 @@
     },
     {
       "key": "threads",
-      "value": ""
+      "value": "https://graph.threads.net/v1.0"
     },
     {
       "key": "thread_app_id",
