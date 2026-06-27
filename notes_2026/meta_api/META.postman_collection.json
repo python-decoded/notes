@@ -1,0 +1,1605 @@
+{
+  "info": {
+    "_postman_id": "1be998fd-70b5-4726-b921-7117f97bae4e",
+    "name": "META",
+    "description": "Колекція допомагає виконувати постинг по REST API у Facebook Page, Instagram Business Account, Threads.\n\n1. Створіть акаунти у Facebook, Instagram, Threads\n    \n2. Створіть Facebook Page\n    \n3. Перетворіть Instagram account на Business або Creator\n    \n4. Приєднайте Instagram Account до Facebook Page\n    \n5. Створіть Facebook Dev Account  \n    [https://developers.facebook.com/](https://developers.facebook.com/)\n    \n6. Створіть у Facebook Dev Account новий APP  \n    вказавши у якості Сценаріїв використання Facebook, Instagram, Threads  \n    [https://developers.facebook.com/apps/](https://developers.facebook.com/apps/)\n    \n7. Виконайте налаштування APP\n    \n8. ДодайтеTester Accounts для Threads та Instagram  \n    [https://developers.facebook.com/apps/1685818265872389/roles/roles/](https://developers.facebook.com/apps/1685818265872389/roles/roles/)\n    \n9. Прийміть запрошення у Threads Account\n    \n10. Створіть user_access_token для Facebook та Threads  \n    [https://developers.facebook.com/tools/explorer/](https://developers.facebook.com/tools/explorer/)\n    \n11. Заповніть секрети у цій колекції\n    \n12. Створіть пусте середовище змінних (Local Environment)\n    \n13. Почніть викоритсовувати цю колекцію",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "4983510"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Get Long Lived User Access Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Exchange short lived token on Long Lived Token\r",
+                  "pm.collectionVariables.set(\"user_access_token\", pm.response.json().access_token);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{fb}}/oauth/access_token?client_id={{app_id}}&client_secret={{app_secret}}&grant_type=fb_exchange_token&fb_exchange_token={{user_access_token}}",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "oauth",
+                "access_token"
+              ],
+              "query": [
+                {
+                  "key": "client_id",
+                  "value": "{{app_id}}"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{app_secret}}"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "fb_exchange_token"
+                },
+                {
+                  "key": "fb_exchange_token",
+                  "value": "{{user_access_token}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate App Access Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// App access tokens let you read and modify app settings. \r",
+                  "// Generate one using your Meta app secret via a server-to-server call.\r",
+                  "\r",
+                  "pm.environment.set(\"app_token\", pm.response.json().access_token);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{fb}}/oauth/access_token?client_id={{app_id}}&client_secret={{app_secret}}&grant_type=client_credentials",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "oauth",
+                "access_token"
+              ],
+              "query": [
+                {
+                  "key": "client_id",
+                  "value": "{{app_id}}"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{app_secret}}"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Me Data",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{fb}}/me?fields=id,name&access_token={{user_access_token}}",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "me"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "id,name"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{user_access_token}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Pages Data",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"page_id\", pm.response.json().data[0].id); \r",
+                  "pm.environment.set(\"page_name\", pm.response.json().data[0].name);\r",
+                  "pm.environment.set(\"page_token\", pm.response.json().data[0].access_token);\r",
+                  "pm.environment.set(\"instagram_business_account\", pm.response.json().data[0].instagram_business_account.id);\r",
+                  "  "
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{fb}}/me/accounts?access_token={{user_access_token}}&fields=id,global_brand_page_name,access_token,name,tasks,instagram_business_account",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "me",
+                "accounts"
+              ],
+              "query": [
+                {
+                  "key": "access_token",
+                  "value": "{{user_access_token}}"
+                },
+                {
+                  "key": "fields",
+                  "value": "id,global_brand_page_name,access_token,name,tasks,instagram_business_account"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Page  Data",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"page_name\", pm.response.json().name);\r",
+                  "pm.environment.set(\"page_token\", pm.response.json().access_token);\r",
+                  "pm.environment.set(\"instagram_business_account\", pm.response.json().instagram_business_account.id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{fb}}/{{page_id}}?access_token={{user_access_token}}&fields=id,global_brand_page_name,access_token,name,instagram_business_account",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{page_id}}"
+              ],
+              "query": [
+                {
+                  "key": "access_token",
+                  "value": "{{user_access_token}}"
+                },
+                {
+                  "key": "fields",
+                  "value": "id,global_brand_page_name,access_token,name,instagram_business_account"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "FB",
+      "item": [
+        {
+          "name": "Page  Post Text Feed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "message",
+                  "value": "Hello World",
+                  "type": "text",
+                  "uuid": "448eb323-23e2-42df-980b-ef8044bbc865"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{page_token}}",
+                  "type": "text",
+                  "uuid": "01a4ac93-66fb-4c0b-8fcd-d3feb1f7fff8"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{fb}}/{{page_id}}/feed",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{page_id}}",
+                "feed"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Page  Post Photo by URL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "caption",
+                  "value": "Hello World from Python Decoded",
+                  "type": "text",
+                  "uuid": "448eb323-23e2-42df-980b-ef8044bbc865"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{page_token}}",
+                  "type": "text",
+                  "uuid": "01a4ac93-66fb-4c0b-8fcd-d3feb1f7fff8"
+                },
+                {
+                  "key": "url",
+                  "value": "https://yt3.ggpht.com/FQXVnYDzmC26-dVvnjLMudhsg55RbQWStbh69WStuFz-uqPfx5vrkQRc29cUid7bfoYRNz8cVes=s88-c-k-c0x00ffffff-no-rj",
+                  "type": "text",
+                  "uuid": "f3254267-c205-4da1-a009-ad2fb3b281fe"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{fb}}/{{page_id}}/photos",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{page_id}}",
+                "photos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Page  Post Local Photo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "caption",
+                  "value": "Hello World from Python Decoded",
+                  "type": "text",
+                  "uuid": "448eb323-23e2-42df-980b-ef8044bbc865"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{page_token}}",
+                  "type": "text",
+                  "uuid": "01a4ac93-66fb-4c0b-8fcd-d3feb1f7fff8"
+                },
+                {
+                  "key": "source",
+                  "type": "file",
+                  "uuid": "f3254267-c205-4da1-a009-ad2fb3b281fe",
+                  "src": "/D:/checkio recordings/skills/Записати.JPG"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{fb}}/{{page_id}}/photos",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{page_id}}",
+                "photos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Page  Photo Unpublished for Feed 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "pm.environment.set(\"feed_item_1_id\", pm.response.json().id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "caption",
+                  "value": "Hello World from Python Decoded",
+                  "type": "text",
+                  "uuid": "448eb323-23e2-42df-980b-ef8044bbc865"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{page_token}}",
+                  "type": "text",
+                  "uuid": "01a4ac93-66fb-4c0b-8fcd-d3feb1f7fff8"
+                },
+                {
+                  "key": "source",
+                  "type": "file",
+                  "uuid": "f3254267-c205-4da1-a009-ad2fb3b281fe",
+                  "src": "/D:/checkio recordings/skills/5265040880656129627.png"
+                },
+                {
+                  "key": "published",
+                  "value": "false",
+                  "type": "text",
+                  "uuid": "809f6683-7009-4e7e-9c76-853cc5bbb4b9"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{fb}}/{{page_id}}/photos",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{page_id}}",
+                "photos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Page  Photo Unpublished for Feed 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "pm.environment.set(\"feed_item_2_id\", pm.response.json().id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "caption",
+                  "value": "Hello World from Python Decoded",
+                  "type": "text",
+                  "uuid": "448eb323-23e2-42df-980b-ef8044bbc865"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{page_token}}",
+                  "type": "text",
+                  "uuid": "01a4ac93-66fb-4c0b-8fcd-d3feb1f7fff8"
+                },
+                {
+                  "key": "source",
+                  "type": "file",
+                  "uuid": "f3254267-c205-4da1-a009-ad2fb3b281fe",
+                  "src": "/D:/checkio recordings/skills/5265040880656129627.png"
+                },
+                {
+                  "key": "published",
+                  "value": "false",
+                  "type": "text",
+                  "uuid": "809f6683-7009-4e7e-9c76-853cc5bbb4b9"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{fb}}/{{page_id}}/photos",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{page_id}}",
+                "photos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Page  Feed With Photos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "message",
+                  "value": "Hello World from Python Decoded",
+                  "type": "text",
+                  "uuid": "448eb323-23e2-42df-980b-ef8044bbc865"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{page_token}}",
+                  "type": "text",
+                  "uuid": "01a4ac93-66fb-4c0b-8fcd-d3feb1f7fff8"
+                },
+                {
+                  "key": "attached_media[0]",
+                  "type": "text",
+                  "uuid": "f3254267-c205-4da1-a009-ad2fb3b281fe",
+                  "value": "{\"media_fbid\":\"{{feed_item_1_id}}\"}"
+                },
+                {
+                  "key": "attached_media[1]",
+                  "value": "{\"media_fbid\":\"{{feed_item_2_id}}\"}",
+                  "type": "text",
+                  "uuid": "209a983f-e333-4f07-b5ae-d35fcbc7096c"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{fb}}/{{page_id}}/feed",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{page_id}}",
+                "feed"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Instagram via FB API",
+      "item": [
+        {
+          "name": "IG Me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{fb}}/{{instagram_business_account}}?fields=name,followers_count,media_count&access_token={{user_access_token}}",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{instagram_business_account}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "name,followers_count,media_count"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{user_access_token}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "IG Other Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{fb}}/{{instagram_business_account}}?fields=business_discovery.username(bluebottle){name,followers_count,media_count}&access_token={{user_access_token}}",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{instagram_business_account}}"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "business_discovery.username(bluebottle){name,followers_count,media_count}"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{user_access_token}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "IG Create Media Container",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "pm.collectionVariables.set(\"instagram_media_container_id\", pm.response.json().id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image_url",
+                  "value": "https://miro.medium.com/v2/resize:fit:786/format:webp/0*Pli6K5B8POIALUPe",
+                  "type": "text",
+                  "uuid": "06d7e6aa-b428-4e35-ac40-0810d325c385"
+                },
+                {
+                  "key": "caption",
+                  "value": "Hello World",
+                  "type": "text",
+                  "uuid": "b46d0fcf-7b30-487e-bdd7-1247f5204d69"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{user_access_token}}",
+                  "type": "text",
+                  "uuid": "68b043e2-58b9-4c98-8bd8-ce1d1e14626a"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{fb}}/{{instagram_business_account}}/media",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{instagram_business_account}}",
+                "media"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "IG Media Publish",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "pm.environment.set(\"instagram_last_published_id\", pm.response.json().id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "creation_id",
+                  "value": "{{instagram_media_container_id}}",
+                  "type": "text",
+                  "uuid": "06d7e6aa-b428-4e35-ac40-0810d325c385"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{user_access_token}}",
+                  "type": "text",
+                  "uuid": "68b043e2-58b9-4c98-8bd8-ce1d1e14626a"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{fb}}/{{instagram_business_account}}/media_publish",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{instagram_business_account}}",
+                "media_publish"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "IG Create Media Carousell Item 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "pm.environment.set(\"instagram_carousell_item_1_id\", pm.response.json().id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image_url",
+                  "value": "https://miro.medium.com/v2/resize:fit:1000/0*FGz8gU3nQILSesYT.png",
+                  "type": "text",
+                  "uuid": "06d7e6aa-b428-4e35-ac40-0810d325c385"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{user_access_token}}",
+                  "type": "text",
+                  "uuid": "68b043e2-58b9-4c98-8bd8-ce1d1e14626a"
+                },
+                {
+                  "key": "is_carousel_item",
+                  "value": "true",
+                  "type": "text",
+                  "uuid": "5b2d69ea-378b-4654-8538-f0f5d3f3ab18"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{fb}}/{{instagram_business_account}}/media",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{instagram_business_account}}",
+                "media"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "IG Create Media Carousell Item 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "pm.environment.set(\"instagram_carousell_item_2_id\", pm.response.json().id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image_url",
+                  "value": "https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fk2pzp0m8ys5qu0upkz65.jpg",
+                  "type": "text",
+                  "uuid": "06d7e6aa-b428-4e35-ac40-0810d325c385"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{user_access_token}}",
+                  "type": "text",
+                  "uuid": "68b043e2-58b9-4c98-8bd8-ce1d1e14626a"
+                },
+                {
+                  "key": "is_carousel_item",
+                  "value": "true",
+                  "type": "text",
+                  "uuid": "5b2d69ea-378b-4654-8538-f0f5d3f3ab18"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{fb}}/{{instagram_business_account}}/media",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{instagram_business_account}}",
+                "media"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "IG Create Carousell Container",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "pm.environment.set(\"instagram_media_container_id\", pm.response.json().id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "access_token",
+                  "value": "{{user_access_token}}",
+                  "type": "text",
+                  "uuid": "68b043e2-58b9-4c98-8bd8-ce1d1e14626a"
+                },
+                {
+                  "key": "children",
+                  "value": "{{instagram_carousell_item_1_id}},{{instagram_carousell_item_2_id}}",
+                  "type": "text",
+                  "uuid": "0e56815b-7256-43eb-9278-9928ed2dc3cf"
+                },
+                {
+                  "key": "caption",
+                  "value": "My carousel",
+                  "type": "text",
+                  "uuid": "390ecc1c-d7ae-4db8-8e57-f82c0dacd3e9"
+                },
+                {
+                  "key": "media_type",
+                  "value": "CAROUSEL",
+                  "type": "text",
+                  "uuid": "9e473d9b-a486-4d13-bd71-54661f9757d5"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{fb}}/{{instagram_business_account}}/media",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{instagram_business_account}}",
+                "media"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "IG Media Publish Carousell",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "pm.environment.set(\"instagram_last_published_id\", pm.response.json().id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "creation_id",
+                  "value": "{{instagram_media_container_id}}",
+                  "type": "text",
+                  "uuid": "06d7e6aa-b428-4e35-ac40-0810d325c385"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{user_access_token}}",
+                  "type": "text",
+                  "uuid": "68b043e2-58b9-4c98-8bd8-ce1d1e14626a"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{fb}}/{{instagram_business_account}}/media_publish",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{instagram_business_account}}",
+                "media_publish"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "IG Create Media Container Reels",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "pm.environment.set(\"instagram_media_container_id\", pm.response.json().id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "video_url",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "06d7e6aa-b428-4e35-ac40-0810d325c385"
+                },
+                {
+                  "key": "caption",
+                  "value": "My Reel",
+                  "type": "text",
+                  "uuid": "b46d0fcf-7b30-487e-bdd7-1247f5204d69"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{user_access_token}}",
+                  "type": "text",
+                  "uuid": "68b043e2-58b9-4c98-8bd8-ce1d1e14626a"
+                },
+                {
+                  "key": "media_type",
+                  "value": "REELS",
+                  "type": "text",
+                  "uuid": "4265678c-ce08-489e-8aaf-1a7f43f78fde"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{fb}}/{{instagram_business_account}}/media",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{instagram_business_account}}",
+                "media"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "IG Media Publish Reel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "pm.environment.set(\"instagram_last_published_id\", pm.response.json().id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "creation_id",
+                  "value": "{{instagram_media_container_id}}",
+                  "type": "text",
+                  "uuid": "06d7e6aa-b428-4e35-ac40-0810d325c385"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{user_access_token}}",
+                  "type": "text",
+                  "uuid": "68b043e2-58b9-4c98-8bd8-ce1d1e14626a"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{fb}}/{{instagram_business_account}}/media_publish",
+              "host": [
+                "{{fb}}"
+              ],
+              "path": [
+                "{{instagram_business_account}}",
+                "media_publish"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Threads API",
+      "item": [
+        {
+          "name": "Prolonging Threads Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Exchange short lived token on Long Lived Token\r",
+                  "pm.collectionVariables.set(\"threads_app_token\", pm.response.json().access_token);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{threads}}/access_token?grant_type=th_exchange_token&client_secret={{thread_app_secret}}&access_token={{threads_app_token}}",
+              "host": [
+                "{{threads}}"
+              ],
+              "path": [
+                "access_token"
+              ],
+              "query": [
+                {
+                  "key": "grant_type",
+                  "value": "th_exchange_token"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{thread_app_secret}}"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{threads_app_token}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Threads Me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{threads}}/me?fields=id,username&access_token={{threads_app_token}}",
+              "host": [
+                "{{threads}}"
+              ],
+              "path": [
+                "me"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "id,username"
+                },
+                {
+                  "key": "access_token",
+                  "value": "{{threads_app_token}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Text Container",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"threads_container_id\", pm.response.json().id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{threads_app_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "media_type",
+                  "value": "TEXT",
+                  "type": "text",
+                  "uuid": "39b7e6bc-596a-44ff-be3b-cd41546ec639"
+                },
+                {
+                  "key": "text",
+                  "value": "Hello Threads! This post was created via the Threads API.",
+                  "type": "text",
+                  "uuid": "7b0f3122-1a2c-43e9-8e7b-4e8704db3c74"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{threads}}/me/threads",
+              "host": [
+                "{{threads}}"
+              ],
+              "path": [
+                "me",
+                "threads"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Post Thread",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"threads_last_published_id\", pm.response.json().id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{threads_app_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "creation_id",
+                  "value": "{{threads_container_id}}",
+                  "type": "text",
+                  "uuid": "7b0f3122-1a2c-43e9-8e7b-4e8704db3c74"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{threads}}/me/threads_publish",
+              "host": [
+                "{{threads}}"
+              ],
+              "path": [
+                "me",
+                "threads_publish"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Image Container",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"threads_container_id\", pm.response.json().id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{threads_app_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "media_type",
+                  "value": "IMAGE",
+                  "type": "text",
+                  "uuid": "39b7e6bc-596a-44ff-be3b-cd41546ec639"
+                },
+                {
+                  "key": "text",
+                  "value": "Hello Threads! ",
+                  "type": "text",
+                  "uuid": "7b0f3122-1a2c-43e9-8e7b-4e8704db3c74"
+                },
+                {
+                  "key": "image_url",
+                  "value": "https://miro.medium.com/v2/resize:fit:786/format:webp/0*Pli6K5B8POIALUPe",
+                  "type": "text",
+                  "uuid": "08b69a3f-e271-457c-adb8-edb196287043"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{threads}}/me/threads",
+              "host": [
+                "{{threads}}"
+              ],
+              "path": [
+                "me",
+                "threads"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Post Thread",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"threads_last_published_id\", pm.response.json().id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{threads_app_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "creation_id",
+                  "value": "{{threads_container_id}}",
+                  "type": "text",
+                  "uuid": "7b0f3122-1a2c-43e9-8e7b-4e8704db3c74"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{threads}}/me/threads_publish",
+              "host": [
+                "{{threads}}"
+              ],
+              "path": [
+                "me",
+                "threads_publish"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Video Container",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"threads_container_id\", pm.response.json().id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{threads_app_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "media_type",
+                  "value": "VIDEO",
+                  "type": "text",
+                  "uuid": "39b7e6bc-596a-44ff-be3b-cd41546ec639"
+                },
+                {
+                  "key": "text",
+                  "value": "Hello Threads! ",
+                  "type": "text",
+                  "uuid": "7b0f3122-1a2c-43e9-8e7b-4e8704db3c74"
+                },
+                {
+                  "key": "video_url",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "08b69a3f-e271-457c-adb8-edb196287043"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{threads}}/me/threads",
+              "host": [
+                "{{threads}}"
+              ],
+              "path": [
+                "me",
+                "threads"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Post Thread",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\"threads_last_published_id\", pm.response.json().id);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{threads_app_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "creation_id",
+                  "value": "{{threads_container_id}}",
+                  "type": "text",
+                  "uuid": "7b0f3122-1a2c-43e9-8e7b-4e8704db3c74"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{threads}}/me/threads_publish",
+              "host": [
+                "{{threads}}"
+              ],
+              "path": [
+                "me",
+                "threads_publish"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "fb",
+      "value": ""
+    },
+    {
+      "key": "app_id",
+      "value": ""
+    },
+    {
+      "key": "app_secret",
+      "value": ""
+    },
+    {
+      "key": "user_access_token",
+      "value": ""
+    },
+    {
+      "key": "threads",
+      "value": ""
+    },
+    {
+      "key": "thread_app_id",
+      "value": ""
+    },
+    {
+      "key": "thread_app_secret",
+      "value": ""
+    },
+    {
+      "key": "threads_app_token",
+      "value": ""
+    }
+  ]
+}
