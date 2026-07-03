@@ -2,3 +2,4 @@ pytubefix
 gooey
 pyinstaller
 yt-dlp
+youtube-transcript-api

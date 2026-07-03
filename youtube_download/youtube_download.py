@@ -1,5 +1,3 @@
-import sys
-import io
 from pathlib import Path
 from urllib.request import urlopen
 from functools import lru_cache
@@ -7,16 +5,14 @@ from functools import lru_cache
 from pytubefix import YouTube, Playlist
 import yt_dlp
 from gooey import Gooey, GooeyParser
-
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-
+from youtube_transcript_api import YouTubeTranscriptApi
 
 def is_playlist(url):
     return "/playlist?list=" in url
 
 
 def is_channel(url):
-    return "/videos" in url
+    return "/videos" in url or "@" in url
 
 
 @lru_cache
@@ -123,8 +119,22 @@ def download_audio(url, path):
 
 def download_info(url, path):
     file_name = get_title(url) + ".txt"
-    with open(Path(path) / file_name, "w", encoding='utf-8') as file:
-        file.write(f"{get_title(url)}\n\n{get_description(url)}")
+    with open(Path(path) / file_name, "wb") as file:
+        file.write(f"{get_title(url)}\n\n{get_description(url)}".encode("utf-8"))
+
+
+def get_transcript(url: str, path: str, languages: tuple = ('uk', 'en')):
+    video_id = url.removeprefix("https://www.youtube.com/watch?v=")
+    file_name = get_title(url) + "__transcript.txt"
+
+    try:
+        transcript = YouTubeTranscriptApi().fetch(video_id, languages=languages)
+
+        with open(Path(path) / file_name, "w", encoding="utf-8") as file:
+            for entry in transcript:
+                file.write(f"{entry.text}\n")
+    except:
+        print(f'Не зміг вивантажити субтитри для: {get_title(url)}')
 
 
 def download_thumbnail(url, path):
@@ -179,6 +189,8 @@ def process_video(url, args):
         download_thumbnail(url, args.download_dir)
     if args.description:
         download_info(url, args.download_dir)
+    if args.transcript:
+        get_transcript(url, args.download_dir, args.transcript.strip().split(","))
 
 
 @Gooey(program_name="Youtube Downloader v1.2.1",
@@ -196,6 +208,7 @@ def main():
     group.add_argument("--audio", action="store_true", help="Save as Audio")
     group.add_argument("--thumbnail", action="store_true", help="Save Thumbnail")
     group.add_argument("--description", action="store_true", help="Save Description")
+    group.add_argument("--transcript", action="store", help="Save Transcript CSV e.g.: 'uk,en'")
     group.add_argument("--indexes",
                        action="store",
                        help="Specify items indexes (for list and chanel download): 1,2,5-12")
@@ -205,7 +218,8 @@ def main():
     if is_playlist(args.url):
         process_list(args.url, args)
     elif is_channel(args.url):
-        process_all_channel_videos(args.url, args)
+        url = args.url.removesuffix("/videos") + "/videos"
+        process_all_channel_videos(url, args)
     else:
         print(f"Завантаження: '{get_title(args.url)}' \nдо папки: {args.download_dir}")
         process_video(args.url, args)

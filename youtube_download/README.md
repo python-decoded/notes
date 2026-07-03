@@ -25,3 +25,4 @@ https://www.youtube.com/watch?v=tge4ojz5w1w
 https://www.youtube.com/playlist?list=PLAMUEkIlR-Va7SZL-DeGRWYepYZa6rehF
 Канал:
 https://www.youtube.com/@python_decoded/videos
+https://www.youtube.com/@python_decoded

@@ -1,5 +1,6 @@
-## Version 1.2.1
-- Fix UnicodeEncodeError on print of video title
+## Version 1.3.0
+- Supports download subtitles
+- Extend url formats for channel
 
 ## Version 1.2.0
 - Supports download of videos from playlist (all or specified by indexes).
