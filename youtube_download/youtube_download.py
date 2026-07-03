@@ -193,7 +193,7 @@ def process_video(url, args):
         get_transcript(url, args.download_dir, args.transcript.strip().split(","))
 
 
-@Gooey(program_name="Youtube Downloader v1.2.1",
+@Gooey(program_name="Youtube Downloader v1.3.0",
        default_size=(500, 600),
        clear_before_run=True)
 def main():
