@@ -18,7 +18,7 @@ def is_channel(url):
 @lru_cache
 def get_ranges(indexes: str) -> list[range]:
 
-    if not indexes.strip():
+    if not indexes or not indexes.strip():
         return []
 
     groups = indexes.replace(" ", "").split(",")
