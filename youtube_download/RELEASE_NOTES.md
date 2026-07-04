@@ -1,6 +1,7 @@
 ## Version 1.3.0
 - Supports download subtitles
 - Extend url formats for channel
+- Fix processing of empty indexes field
 
 ## Version 1.2.0
 - Supports download of videos from playlist (all or specified by indexes).
