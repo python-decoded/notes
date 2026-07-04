@@ -135,6 +135,8 @@ def get_transcript(url: str, path: str, languages: tuple = ('uk', 'en')):
                 file.write(f"{entry.text}\n")
     except:
         print(f'Не зміг вивантажити субтитри для: {get_title(url)}')
+        with open(Path(path) / file_name, "w", encoding="utf-8") as file:
+            file.write("")
 
 
 def download_thumbnail(url, path):
