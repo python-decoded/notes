@@ -3,3 +3,7 @@ gooey
 pyinstaller
 yt-dlp
 youtube-transcript-api
+
+# voice recognition
+torch
+openai-whisper

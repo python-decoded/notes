@@ -1,3 +1,6 @@
+## Version 1.4.0
+- If subtitles not present, generate them by openai-whisper
+
 ## Version 1.3.0
 - Supports download subtitles
 - Extend url formats for channel

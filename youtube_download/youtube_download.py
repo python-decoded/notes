@@ -7,6 +7,9 @@ import yt_dlp
 from gooey import Gooey, GooeyParser
 from youtube_transcript_api import YouTubeTranscriptApi
 
+from transcribe_audio import transcribe_audio
+
+
 def is_playlist(url):
     return "/playlist?list=" in url
 
@@ -89,7 +92,7 @@ def download_video(url, path):
                         max_retries=3)
 
 
-def download_audio(url, path):
+def download_audio(url, path) -> str:
 
     try:
         ydl_opts = {
@@ -105,6 +108,8 @@ def download_audio(url, path):
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
+        return f'{path}/{get_title(url)}.mp3'
+
     except Exception as e:
         print(f"Не вдалося вивантажити аудіо у форматі mp3 задопомогою yt_dlp, {e}")
         if "ffmpeg is not installed" in str(e):
@@ -115,6 +120,7 @@ def download_audio(url, path):
         stream.download(output_path=path,
                         skip_existing=True,
                         max_retries=3)
+        return f'{path}/{get_title(url)}.m4a'
 
 
 def download_info(url, path):
@@ -123,20 +129,30 @@ def download_info(url, path):
         file.write(f"{get_title(url)}\n\n{get_description(url)}".encode("utf-8"))
 
 
-def get_transcript(url: str, path: str, languages: tuple = ('uk', 'en')):
+def get_transcript(url: str, path: str, language: str = 'uk'):
     video_id = url.removeprefix("https://www.youtube.com/watch?v=")
     file_name = get_title(url) + "__transcript.txt"
 
     try:
-        transcript = YouTubeTranscriptApi().fetch(video_id, languages=languages)
+        transcript = YouTubeTranscriptApi().fetch(video_id, languages=(language,))
 
         with open(Path(path) / file_name, "w", encoding="utf-8") as file:
             for entry in transcript:
                 file.write(f"{entry.text}\n")
     except:
         print(f'Не зміг вивантажити субтитри для: {get_title(url)}')
-        with open(Path(path) / file_name, "w", encoding="utf-8") as file:
-            file.write("")
+        print(f'Виконую вивантаження аудіо і автоматичне розпізнавання тексту {language}')
+
+        try:
+            audio_file_path = download_audio(url, path)
+            transcribe_audio(audio_file_path, language=language, timestamps=False,
+                             device="auto", model="custom")
+        except Exception as e:
+            print(f'Не зміг згенерувати субтитри для: {get_title(url)}')
+            print('Можливо потрібно встановити плагін ffmpeg')
+            print(f"Error {type(e).__name__}: {e}")
+            with open(Path(path) / file_name, "w", encoding="utf-8") as file:
+                file.write("")
 
 
 def download_thumbnail(url, path):
@@ -192,10 +208,10 @@ def process_video(url, args):
     if args.description:
         download_info(url, args.download_dir)
     if args.transcript:
-        get_transcript(url, args.download_dir, args.transcript.strip().split(","))
+        get_transcript(url, args.download_dir, args.transcript)
 
 
-@Gooey(program_name="Youtube Downloader v1.3.0",
+@Gooey(program_name="Youtube Downloader v1.4.0",
        default_size=(500, 600),
        clear_before_run=True)
 def main():
@@ -210,7 +226,9 @@ def main():
     group.add_argument("--audio", action="store_true", help="Save as Audio")
     group.add_argument("--thumbnail", action="store_true", help="Save Thumbnail")
     group.add_argument("--description", action="store_true", help="Save Description")
-    group.add_argument("--transcript", action="store", help="Save Transcript CSV e.g.: 'uk,en'")
+    group.add_argument("--transcript", type=str, default=None,  widget="Dropdown",
+                       choices=[None, "uk", "en", "pl", "de", "es", "fr", "it"],
+                       help="Save Transcript")
     group.add_argument("--indexes",
                        action="store",
                        help="Specify items indexes (for list and chanel download): 1,2,5-12")
