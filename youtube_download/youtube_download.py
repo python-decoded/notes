@@ -7,8 +7,6 @@ import yt_dlp
 from gooey import Gooey, GooeyParser
 from youtube_transcript_api import YouTubeTranscriptApi
 
-from transcribe_audio import transcribe_audio
-
 
 def is_playlist(url):
     return "/playlist?list=" in url
@@ -144,6 +142,7 @@ def get_transcript(url: str, path: str, language: str = 'uk'):
         print(f'Виконую вивантаження аудіо і автоматичне розпізнавання тексту {language}')
 
         try:
+            from transcribe_audio import transcribe_audio
             audio_file_path = download_audio(url, path)
             transcribe_audio(audio_file_path, language=language, timestamps=False,
                              device="auto", model="custom")
