@@ -1,5 +1,6 @@
 pytubefix
 gooey
+six  # gooey transitive dependency
 pyinstaller
 yt-dlp
 youtube-transcript-api
