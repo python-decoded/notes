@@ -9,9 +9,23 @@ class Player(turtle.Turtle):
         self.color("cyan")
         self.hp = 100
         self.move_speed = 4
+        self.pressed_keys = {"w": False, "a": False, "s": False, "d": False}
+
+    def key_press(self, k):
+        self.pressed_keys[k] = True
+
+    def key_release(self, k):
+        self.pressed_keys[k] = False
 
     def update(self):
-        ...
+        if self.pressed_keys["w"]:
+            self.sety(self.ycor() + self.move_speed)
+        if self.pressed_keys["s"]:
+            self.sety(self.ycor() - self.move_speed)
+        if self.pressed_keys["a"]:
+            self.setx(self.xcor() - self.move_speed)
+        if self.pressed_keys["f"]:
+            self.setx(self.xcor() + self.move_speed)
 
 
 class Game:
