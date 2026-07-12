@@ -2,7 +2,6 @@ import turtle
 import random
 from collections import defaultdict
 from functools import partial
-from PIL import Image, ImageTk
 
 
 class UI:
@@ -78,9 +77,6 @@ class Player(Turtle):
         self.shape("triangle")
         self.color("cyan")
 
-        self.shape("rocket")
-        self.shapesize(0.4)
-
     def alive(self):
         return self.hp > 0
 
@@ -125,7 +121,6 @@ class Player(Turtle):
         b = Bullet(self.game)
         self.game.bullets.append(b)
         self.wait_fire_release = True
-
 
     def process_collision(self, other):
 
@@ -276,28 +271,6 @@ class Game:
         self.bullets = []
 
         self.screen = self.setup_screen()
-
-        rocket_contour = (
-            (0, 60),  # Гострий кінчик носа (вершина)
-            (-16, 40),  # Ліва грань обтекателя
-            (-23, 15),  # Ліва частина білого фюзеляжу
-            (-23, -25),  # Задня частина фюзеляжу (перед крилом)
-            (-40, -40),  # Кінчик лівого крила
-            (-28, -42),  # Задня кромка лівого крила
-            (-17, -35),  # Основа лівого крила у сопла
-            (-15, -40),  # Сере сопло (лівий кут)
-            (-5, -40),  # Місце виходу пламені (ліва точка)
-            (0, -65),  # Найнижчий кінчик вогняного хвоста (пламя)
-            (5, -40),  # Місце виходу пламені (права точка)
-            (15, -40),  # Сере сопло (правий кут)
-            (17, -35),  # Основа правого крила у сопла
-            (28, -42),  # Задня кромка правого крила
-            (40, -40),  # Кінчик правого крила
-            (23, -25),  # Задня частина фюзеляжу (після крила)
-            (23, 15),  # Права частина білого фюзеляжу
-            (16, 40)  # Права грань обтекателя
-        )
-        turtle.register_shape("rocket", turtle.Shape("polygon", data=rocket_contour))
 
         self.hud = UI(self)
         self.game_over_screen = GameOverScreen(self)
