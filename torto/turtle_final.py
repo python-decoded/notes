@@ -372,8 +372,11 @@ class Game:
                     i.process_collision(j)
                     j.process_collision(i)
 
+    def run(self):
+        self.update()
+        game.screen.ontimer(self.run, 50)  # ~ 20 FPS
+
 
 game = Game()
-while True:
-    time.sleep(0.05)  # ~20 FPS
-    game.update()
+game.run()
+turtle.done()
