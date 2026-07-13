@@ -60,6 +60,11 @@ class Game:
         self.player = Player()
         self.enemies = [Enemy(self) for _ in range(5)]
 
+        self.ui = turtle.Turtle()
+        self.ui.goto(-350, 250)
+        self.ui.color("white")
+        self.ui.hideturtle()
+
         self.screen.listen()
         self.screen.onkeypress(lambda: self.player.key_press("w"), "w")
         self.screen.onkeypress(lambda: self.player.key_press("a"), "a")
@@ -75,6 +80,9 @@ class Game:
             self.player.update()
             for e in self.enemies:
                 e.update()
+
+        self.ui.clear()
+        self.ui.write(f"HP: {self.player.hp}", font=("Arial", 16, "normal"))
 
         self.screen.update()
 
