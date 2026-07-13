@@ -24,9 +24,7 @@ class UI:
 
 class Controller:
 
-    def __init__(self, game):
-        self.game = game
-
+    def __init__(self):
         self.pressed_keys = defaultdict(lambda: False)
         self.mouse_down = False
 
@@ -125,7 +123,10 @@ class Player(Turtle):
     def process_collision(self, other):
 
         if isinstance(other, Enemy):
-            self.hp -= 1
+            self.hp = max(0, self.hp - 1)
+            if self.hp <= 0:
+                self.game.game_over = True
+
         elif isinstance(other, SpeedPack):
             self.move_speed += 0.2
             other.spawn()
@@ -155,12 +156,6 @@ class Enemy(Turtle):
 
         self.setheading(self.towards(self.game.player))
         self.forward(self.game.enemy_speed)
-
-        if self.distance(self.game.player) < 20:
-            self.game.player.hp -= 1
-
-        if self.game.player.hp <= 0:
-            self.game.game_over = True
 
     def process_collision(self, other: "Turtle"):
         if isinstance(other, Bullet):
@@ -276,7 +271,7 @@ class Game:
         self.game_over_screen = GameOverScreen(self)
 
         self.player = Player(self)
-        self.controller = Controller(self)
+        self.controller = Controller()
         self.setup_listeners()
 
         self.speed_pack = SpeedPack(self)
