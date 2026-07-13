@@ -77,7 +77,11 @@ class Game:
         self.screen.getcanvas().bind("<Motion>", self.on_mouse_move)
 
     def on_mouse_move(self, event: Event):
-        ...
+
+        if self.player.hp > 0:
+            x = event.x - self.screen.canvwidth
+            y = self.screen.canvheight - event.y
+            self.player.setheading(self.player.towards(x, y))
 
     def on_mouse_left_click(self, event: Event):
         self.mouse_left_hold = True
