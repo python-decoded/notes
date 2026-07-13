@@ -37,7 +37,7 @@ class Controller:
     def key_release(self, k):
         self.pressed_keys[k] = False
 
-    def mouse_press(self, x, y):
+    def mouse_press(self, event):
         self.mouse_down = True
 
     def mouse_release(self, event):
@@ -316,7 +316,7 @@ class Game:
 
         self.screen.onkeypress(self.setup_game, "r")
         self.screen.getcanvas().bind("<Motion>", self.player.rotate_towards_mouse_position)
-        self.screen.onscreenclick(self.controller.mouse_press, btn=1)
+        self.screen.getcanvas().bind("<Button-1>", self.controller.mouse_press)
         self.screen.getcanvas().bind("<ButtonRelease-1>", self.controller.mouse_release)
 
     def setup_game(self):
