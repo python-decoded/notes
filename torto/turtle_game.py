@@ -154,9 +154,8 @@ class Game:
         self.screen.update()
 
     def run(self):
-        while True:
-            time.sleep(0.02)  # 20 FPS
-            self.update()
+        self.update()
+        self.screen.ontimer(self.run, 50)  # 20 FPS
 
 
 game = Game()
