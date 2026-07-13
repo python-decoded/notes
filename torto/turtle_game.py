@@ -1,6 +1,7 @@
 import turtle
 import time
 import random
+from tkinter import Event
 
 
 class Enemy(turtle.Turtle):
@@ -66,14 +67,25 @@ class Game:
         self.ui.hideturtle()
 
         self.screen.listen()
-        self.screen.onkeypress(lambda: self.player.key_press("w"), "w")
-        self.screen.onkeypress(lambda: self.player.key_press("a"), "a")
-        self.screen.onkeypress(lambda: self.player.key_press("s"), "s")
-        self.screen.onkeypress(lambda: self.player.key_press("d"), "d")
-        self.screen.onkeyrelease(lambda: self.player.key_release("w"), "w")
-        self.screen.onkeyrelease(lambda: self.player.key_release("a"), "a")
-        self.screen.onkeyrelease(lambda: self.player.key_release("s"), "s")
-        self.screen.onkeyrelease(lambda: self.player.key_release("d"), "d")
+        for i in "awsd":
+            self.screen.getcanvas().bind(f"<KeyPress-{i}>", self.on_key_press)
+            self.screen.getcanvas().bind(f"<KeyRelease-{i}>", self.on_key_release)
+
+        self.mouse_left_hold = False
+        self.screen.getcanvas().bind("<Button-1>", self.on_mouse_left_click)
+        self.screen.getcanvas().bind("<ButtonRelease-1>", self.on_mouse_left_release)
+
+    def on_mouse_left_click(self, event: Event):
+        self.mouse_left_hold = True
+
+    def on_mouse_left_release(self, event: Event):
+        self.mouse_left_hold = False
+
+    def on_key_press(self, event: Event):
+        self.player.key_press(event.keysym)
+
+    def on_key_release(self, event: Event):
+        self.player.key_release(event.keysym)
 
     def update(self):
         if self.player.hp > 0:
