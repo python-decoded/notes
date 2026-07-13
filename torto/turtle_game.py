@@ -74,7 +74,11 @@ class Game:
         self.mouse_left_hold = False
         self.screen.getcanvas().bind("<Button-1>", self.on_mouse_left_click)
         self.screen.getcanvas().bind("<ButtonRelease-1>", self.on_mouse_left_release)
+        self.screen.getcanvas().bind("<Motion>", self.on_mouse_move)
 
+    def on_mouse_move(self, event: Event):
+        ...
+    
     def on_mouse_left_click(self, event: Event):
         self.mouse_left_hold = True
 
