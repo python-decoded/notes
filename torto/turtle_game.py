@@ -1,5 +1,20 @@
 import turtle
 import time
+import random
+
+
+class Enemy(turtle.Turtle):
+    def __init__(self):
+        super().__init__()
+        self.shape("circle")
+        self.color("red")
+        self.penup()
+
+        self.goto(random.randint(-self.screen.canvwidth, self.screen.canvwidth),
+                  random.randint(-self.screen.canvheight, self.screen.canvheight))
+
+    def update(self):
+        ...
 
 
 class Player(turtle.Turtle):
@@ -39,6 +54,7 @@ class Game:
         self.screen.tracer(0)  # turtle animation off
 
         self.player = Player()
+        self.enemies = [Enemy() for _ in range(5)]
 
         self.screen.listen()
         self.screen.onkeypress(lambda: self.player.key_press("w"), "w")
