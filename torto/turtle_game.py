@@ -22,7 +22,24 @@ class Bullet(turtle.Turtle):
         self.showturtle()
 
     def update(self):
+        if not self.isvisible():
+            return
+
         self.forward(12)
+
+        if abs(self.xcor()) > self.screen.window_width() // 2:
+            self.hideturtle()
+            return
+        if abs(self.ycor()) > self.screen.window_height() // 2:
+            self.hideturtle()
+            return
+
+        for e in self.game.enemies:
+            if self.distance(*e.position()) < 20:
+                self.hideturtle()
+                e.goto(random.randint(-self.screen.canvwidth, self.screen.canvwidth),
+                       random.randint(-self.screen.canvheight, self.screen.canvheight))
+                self.game.player.killed += 1
 
 
 class Enemy(turtle.Turtle):
@@ -52,6 +69,7 @@ class Player(turtle.Turtle):
 
         self.hp = 100
         self.move_speed = 4
+        self.killed = 0
         self.pressed_keys = {"w": False, "a": False, "s": False, "d": False}
 
     def key_press(self, k):
@@ -131,7 +149,7 @@ class Game:
                 b.update()
 
         self.ui.clear()
-        self.ui.write(f"HP: {self.player.hp}", font=("Arial", 16, "normal"))
+        self.ui.write(f"HP: {self.player.hp}  KILLED: {self.player.killed}", font=("Arial", 16, "normal"))
 
         self.screen.update()
 
