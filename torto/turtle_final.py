@@ -2,6 +2,7 @@ import turtle
 import random
 from collections import defaultdict
 from functools import partial
+from tkinter import Event
 
 
 class UI:
@@ -37,12 +38,11 @@ class Controller:
     def key_release(self, k):
         self.pressed_keys[k] = False
 
-    def mouse_press(self, event):
+    def mouse_press(self, event: Event):
         self.mouse_down = True
 
-    def mouse_release(self, event):
+    def mouse_release(self, event: Event):
         self.mouse_down = False
-
 
 
 class Turtle(turtle.Turtle):
@@ -86,7 +86,7 @@ class Player(Turtle):
 
         self.home()
 
-    def rotate_towards_mouse_position(self, event):
+    def rotate_towards_mouse_position(self, event: Event):
         if self.game.game_over:
             return
 
@@ -310,7 +310,10 @@ class Game:
 
         self.screen.listen()
 
+        # KeyPress-a, KeyRelease-a - for keyboard events
+        # ButtonPress-1, ButtonRelease-1, Motion, MouseWheel - for mouse events
         for k in "wasd":
+            #  <KeyPress-%s> <KeyRelease-%s>
             self.screen.onkeypress(partial(self.controller.key_press, k), k)
             self.screen.onkeyrelease(partial(self.controller.key_release, k), k)
 
