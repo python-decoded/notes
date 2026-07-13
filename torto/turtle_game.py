@@ -17,6 +17,8 @@ class Enemy(turtle.Turtle):
     def update(self):
         self.setheading(self.towards(self.game.player))
         self.forward(1.4)
+        if self.distance(self.game.player) <= 20:
+            self.game.player.hp = max(0, self.game.player.hp - 1)
 
 
 class Player(turtle.Turtle):
