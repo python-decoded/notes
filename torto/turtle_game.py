@@ -4,6 +4,27 @@ import random
 from tkinter import Event
 
 
+class Bullet(turtle.Turtle):
+    def __init__(self, game: "Game"):
+        super().__init__()
+        self.shape("circle")
+        self.color("yellow")
+        self.shapesize(0.3)
+        self.penup()
+        self.hideturtle()
+
+        self.game = game
+
+    def launch(self, position, angle):
+        self.teleport(*position)
+        self.setheading(angle)
+        self.pendown()
+        self.showturtle()
+
+    def update(self):
+        self.forward(12)
+
+
 class Enemy(turtle.Turtle):
     def __init__(self, game: "Game"):
         super().__init__()
@@ -60,6 +81,7 @@ class Game:
 
         self.player = Player()
         self.enemies = [Enemy(self) for _ in range(5)]
+        self.bullets = [Bullet(self) for _ in range(6)]
 
         self.ui = turtle.Turtle()
         self.ui.goto(-350, 250)
@@ -86,6 +108,11 @@ class Game:
     def on_mouse_left_click(self, event: Event):
         self.mouse_left_hold = True
 
+        for b in self.bullets:
+            if not b.isvisible():
+                b.launch(self.player.position(), self.player.heading())
+                break
+
     def on_mouse_left_release(self, event: Event):
         self.mouse_left_hold = False
 
@@ -100,6 +127,8 @@ class Game:
             self.player.update()
             for e in self.enemies:
                 e.update()
+            for b in self.bullets:
+                b.update()
 
         self.ui.clear()
         self.ui.write(f"HP: {self.player.hp}", font=("Arial", 16, "normal"))
