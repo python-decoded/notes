@@ -78,7 +78,7 @@ class Game:
 
     def on_mouse_move(self, event: Event):
         ...
-    
+
     def on_mouse_left_click(self, event: Event):
         self.mouse_left_hold = True
 
