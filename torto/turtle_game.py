@@ -119,8 +119,8 @@ class Game:
     def on_mouse_move(self, event: Event):
 
         if self.player.hp > 0:
-            x = event.x - self.screen.canvwidth
-            y = self.screen.canvheight - event.y
+            x = event.x - self.screen.window_width() // 2
+            y = self.screen.window_height() // 2 - event.y
             self.player.setheading(self.player.towards(x, y))
 
     def on_mouse_left_click(self, event: Event):
