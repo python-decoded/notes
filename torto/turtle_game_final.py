@@ -121,12 +121,6 @@ class Player(Turtle):
                 b.launch(self.position(), self.heading())
                 break
 
-        # if len(self.game.bullets) > self.ammo:
-        #     return
-        #
-        # b = Bullet(self.game)
-        # b.launch(self.position(), self.heading())
-        # self.game.bullets.append(b)
         self.wait_fire_release = True
 
     def process_collision(self, other):
@@ -320,7 +314,7 @@ class Game:
         self.screen.getcanvas().bind("<ButtonRelease-1>", self.controller.mouse_release)
 
     def setup_game(self):
-        
+
         self.kills = 0
         self.enemy_speed = 38
 
