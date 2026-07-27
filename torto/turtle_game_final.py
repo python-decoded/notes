@@ -86,7 +86,6 @@ class Player(Turtle):
         self.hp = 100
         self.kills = 0
         self.move_speed = 80
-        self.ammo = 5
 
         self.home()
 
@@ -117,11 +116,17 @@ class Player(Turtle):
         if not self.game.controller.mouse_down or self.game.game_over:
             return
 
-        if len(self.game.bullets) > self.ammo:
-            return
+        for b in self.game.bullets:
+            if not b.isvisible():
+                b.launch(self.position(), self.heading())
+                break
 
-        b = Bullet(self.game)
-        self.game.bullets.append(b)
+        # if len(self.game.bullets) > self.ammo:
+        #     return
+        #
+        # b = Bullet(self.game)
+        # b.launch(self.position(), self.heading())
+        # self.game.bullets.append(b)
         self.wait_fire_release = True
 
     def process_collision(self, other):
@@ -135,7 +140,7 @@ class Player(Turtle):
             self.move_speed += 5
             other.spawn()
         elif isinstance(other, AmmoPack):
-            self.ammo += 1
+            self.game.bullets.append(Bullet(self.game))
             other.spawn()
 
     def update(self):
@@ -207,12 +212,20 @@ class Bullet(Turtle):
         self.color("yellow")
         self.shapesize(0.3)
 
-        self.goto(self.game.player.xcor(), self.game.player.ycor())
-        self.setheading(self.game.player.heading())
+        self.penup()
+        self.hideturtle()
 
+    def launch(self, position, angle):
+        self.teleport(*position)
+        self.setheading(angle)
         self.pendown()
+        self.showturtle()
 
     def update(self):
+
+        if not self.isvisible():
+            return
+
         if self.game.game_over:
             return
 
@@ -220,15 +233,17 @@ class Bullet(Turtle):
 
         if abs(self.xcor()) > 450 or abs(self.ycor()) > 350:
             self.hideturtle()
-            self.game.bullets.remove(self)
+            self.penup()
             return
 
     def process_collision(self, other: "Turtle"):
+
+        if not self.isvisible():
+            return
+
         if isinstance(other, Enemy):
             self.hideturtle()
-
-            if self in self.game.bullets:
-                self.game.bullets.remove(self)
+            self.penup()
 
 
 class GameOverScreen(Turtle):
@@ -263,7 +278,7 @@ class Game:
     def __init__(self):
 
         self.enemies = []
-        self.bullets = []
+        self.bullets = [Bullet(self) for _ in range(6)]
 
         self.screen = self.setup_screen()
 
@@ -288,24 +303,6 @@ class Game:
         screen.tracer(0)  # turtle animation off
         return screen
 
-    def fill_bg(self):
-
-        t = turtle.Turtle()
-        t.hideturtle()
-        t.fillcolor("black")
-
-        # 2. Start the filling process
-        t.setposition(-400, -300)
-        t.begin_fill()
-
-        # 3. Draw your shape (example: a square)
-        for _ in range(4):
-            t.forward(800)
-            t.left(800)
-
-        # 4. End the filling process
-        t.end_fill()
-
     def setup_listeners(self):
 
         self.screen.listen()
@@ -323,8 +320,7 @@ class Game:
         self.screen.getcanvas().bind("<ButtonRelease-1>", self.controller.mouse_release)
 
     def setup_game(self):
-        self.fill_bg()
-
+        
         self.kills = 0
         self.enemy_speed = 38
 
@@ -333,7 +329,10 @@ class Game:
         for e in self.enemies:
             e.hideturtle()
 
-        self.bullets = []
+        for b in self.bullets:
+            b.clear()
+        self.bullets = self.bullets[:6]
+
         self.enemies = [Enemy(self) for _ in range(5)]
 
         self.game_over = False
