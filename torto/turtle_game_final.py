@@ -5,6 +5,10 @@ from functools import partial
 from tkinter import Event
 
 
+FPS = 30
+DT = 1 / FPS
+
+
 class UI:
 
     font = ("Arial", 14, "bold")
@@ -81,7 +85,7 @@ class Player(Turtle):
     def setup(self):
         self.hp = 100
         self.kills = 0
-        self.move_speed = 4
+        self.move_speed = 80
         self.ammo = 5
 
         self.home()
@@ -96,13 +100,13 @@ class Player(Turtle):
 
     def move(self):
         if self.game.controller.is_pressed("w"):
-            self.sety(self.ycor() + self.move_speed)
+            self.sety(self.ycor() + self.move_speed * DT)
         if self.game.controller.is_pressed("s"):
-            self.sety(self.ycor() - self.move_speed)
+            self.sety(self.ycor() - self.move_speed * DT)
         if self.game.controller.is_pressed("a"):
-            self.setx(self.xcor() - self.move_speed)
+            self.setx(self.xcor() - self.move_speed * DT)
         if self.game.controller.is_pressed("d"):
-            self.setx(self.xcor() + self.move_speed)
+            self.setx(self.xcor() + self.move_speed * DT)
 
     def fire_bullet(self):
         if self.wait_fire_release:
@@ -128,7 +132,7 @@ class Player(Turtle):
                 self.game.game_over = True
 
         elif isinstance(other, SpeedPack):
-            self.move_speed += 0.2
+            self.move_speed += 5
             other.spawn()
         elif isinstance(other, AmmoPack):
             self.ammo += 1
@@ -155,7 +159,7 @@ class Enemy(Turtle):
             return
 
         self.setheading(self.towards(self.game.player))
-        self.forward(self.game.enemy_speed)
+        self.forward(self.game.enemy_speed * DT)
 
     def process_collision(self, other: "Turtle"):
         if isinstance(other, Bullet):
@@ -212,7 +216,7 @@ class Bullet(Turtle):
         if self.game.game_over:
             return
 
-        self.forward(12)
+        self.forward(240 * DT)
 
         if abs(self.xcor()) > 450 or abs(self.ycor()) > 350:
             self.hideturtle()
@@ -326,7 +330,7 @@ class Game:
         self.fill_bg()
 
         self.kills = 0
-        self.enemy_speed = 1.4
+        self.enemy_speed = 38
 
         for b in self.bullets:
             b.hideturtle()
@@ -354,7 +358,7 @@ class Game:
             for e in self.enemies[:]:
                 e.update()
 
-            self.enemy_speed += 0.01  # over time enemies speed raises
+            self.enemy_speed += 2 * DT  # over time enemies speed raises
             self.precess_colision([self.player], [self.speed_pack, self.ammo_pack] + self.enemies)
             self.precess_colision(self.bullets, self.enemies)
 
@@ -371,7 +375,7 @@ class Game:
 
     def run(self):
         self.update()
-        game.screen.ontimer(self.run, 50)  # ~ 20 FPS
+        game.screen.ontimer(self.run, 1000 // FPS)
 
 
 game = Game()
