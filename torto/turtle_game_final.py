@@ -254,10 +254,6 @@ class GameOverScreen(Turtle):
         self.write("Натисни R щоб перезапустити", align="center", font=("Arial", 18, "normal"))
 
 
-# -----------------------------
-# Глобальні структури
-# -----------------------------
-
 class Game:
 
     kills: int
