@@ -12,23 +12,25 @@ echo [%DEFAULT_MODELS_DIR%]
 echo --------------------------------------------------
 set /p "USER_PATH=Enter path: "
 
-:: If empty, use the pre-calculated default path
+:: Якщо шлях не вказано, використати шлях по замовчуванню
 if "%USER_PATH%"=="" (
     set "FOOOCUS_MODELS_DIR=%DEFAULT_MODELS_DIR%"
 ) else (
     set "FOOOCUS_MODELS_DIR=%USER_PATH%"
 )
 
-:: Strip any quotes entered by the user
+:: Прибрати лапки
 set "FOOOCUS_MODELS_DIR=%FOOOCUS_MODELS_DIR:"=%"
 
-:: Replace forward slashes (/) with backward slashes (\)
+:: Замінити прямий слеш на обернений
 set "FOOOCUS_MODELS_DIR=%FOOOCUS_MODELS_DIR:/=\%"
 
-:: Check if the path ends with a backslash; if not, add one
+:: Додати обернений слеш вкінці, якщо відсутній
 if not "%FOOOCUS_MODELS_DIR:~-1%"=="\" set "FOOOCUS_MODELS_DIR=%FOOOCUS_MODELS_DIR%\"
 
 echo.
+
+:: Зупинити контейнер, якщо запущений
 echo [1/3] Stopping previous container (if running)...
 docker rm -f fooocus_container 2>nul
 
