@@ -3,7 +3,7 @@ import requests
 
 url = "http://localhost:8888/v1/generation/text-to-image"
 
-# Параметри генерації (можна налаштовувати під себе)
+# Параметри генерації
 PAYLOAD = {
     "prompt": "Cute fluffy cat playing with a red ball, cinematic lighting",
     "negative_prompt": "low quality, blurry",
@@ -22,7 +22,6 @@ if response.status_code != 200:
     print(response.text)
     exit(1)
 
-# Залежно від налаштувань API повертає або масив посилань, або base64-рядки
 result = response.json()
 print("Генерація успішна!")
 
