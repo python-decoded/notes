@@ -13,7 +13,7 @@
 ## Generate Images using Python
 ```
 pip install -r requirements.txt
-python generate_image.py
+python generate_images.py
 ```
 
 
@@ -23,12 +23,12 @@ Fooocus
 ```powershell
 pip install -r requirements.txt
 $env:FOOOCUS_MODELS_DIR="C:\Users\1\Documents\Fooocus\Fooocus\models"
-python pipeline_generate_image.py
+python pipeline_generate_images.py
 ```
 
 Fooocus Api
 ```powershell
 pip install -r requirements.txt
 $env:FOOOCUS_MODELS_DIR="C:\Users\1\Documents\Fooocus-API\repositories\Fooocus\models"
-python pipeline_generate_image.py
+python pipeline_generate_images.py
 ```

@@ -50,7 +50,7 @@ def wait_server(base_url):
             # Перевіряємо доступність Swagger документації як індикатор готовності
             response = requests.get(f"{base_url}/docs", timeout=5)
             if response.status_code == 200:
-                print("[+] API готове до роботи!")
+                print("API готове до роботи!")
                 api_ready = True
                 break
         except requests.exceptions.RequestException:
@@ -87,7 +87,9 @@ fooocus_container.with_kwargs(
     device_requests=[{"Driver": "nvidia", "Count": -1, "Capabilities": [["compute", "utility"]]}]
 )
 
+
 print("Запуск контейнера Fooocus API через Testcontainers...")
+
 with fooocus_container as container:
     # Отримуємо динамічний або фіксований порт (Testcontainers зазвичай мапить 8888 на випадковий вільний порт Windows)
     host_ip = container.get_container_host_ip()
@@ -102,5 +104,6 @@ with fooocus_container as container:
     generate_image("Cute fluffy cat playing with a red ball, cinematic lighting")
 
     print("Вихід із блоку 'with'. Testcontainers автоматично зупиняє та видаляє контейнер...")
+
 
 print("Контейнер повністю вимкнено та видалено. Роботу завершено.")
