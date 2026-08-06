@@ -1,0 +1,2 @@
+curses-windows
+pygame-ce
