@@ -15,4 +15,4 @@ class Order(BaseModel):
 order = Order(price=14.23, quantity=2,date="2025-10-15")
 
 print(*order.model_dump().items(), sep='\n', end='\n\n')
-print(order.model_dump_json())
+print(order.model_dump_json().replace(',', '\n'))
