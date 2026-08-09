@@ -6,7 +6,7 @@ from pydantic import BaseModel, computed_field, PlainSerializer
 def handler(v: float) -> str:
     return format(v, ",.2f") + "$"
 
-DollarField = Annotated[float, PlainSerializer(handler)]
+DollarField = Annotated[float, PlainSerializer(handler, when_used="json")]
 
 
 class Order(BaseModel):
