@@ -3,7 +3,6 @@ from pydantic import BaseModel, computed_field
 
 
 class Order(BaseModel):
-
     price: float
     quantity: int
     date: datetime
@@ -13,11 +12,7 @@ class Order(BaseModel):
         return self.price * self.quantity
 
 
-order = Order(
-    price=14.23,
-    quantity=2,
-    date=datetime(2025, 10, 15)
-)
+order = Order(price=14.23, quantity=2,date="2025-10-15")
 
-
+print(order.model_dump())
 print(order.model_dump_json())
