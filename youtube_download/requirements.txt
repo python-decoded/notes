@@ -4,7 +4,3 @@ six  # gooey transitive dependency
 pyinstaller
 yt-dlp
 youtube-transcript-api
-
-# voice recognition
-# torch
-# openai-whisper

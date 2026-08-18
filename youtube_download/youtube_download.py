@@ -137,22 +137,11 @@ def get_transcript(url: str, path: str, language: str = 'uk'):
         with open(Path(path) / file_name, "w", encoding="utf-8") as file:
             for entry in transcript:
                 file.write(f"{entry.text}\n")
-    except:
+    except Exception as e:
         print(f'Не зміг вивантажити субтитри для: {get_title(url)}')
-        print(f'Виконую вивантаження аудіо і автоматичне розпізнавання тексту {language}')
-
-        try:
-            from transcribe_audio import transcribe_audio
-            audio_file_path = download_audio(url, path)
-            transcribe_audio(audio_file_path, language=language, timestamps=False,
-                             device="auto", model="custom")
-        except Exception as e:
-            print(f'Не зміг згенерувати субтитри для: {get_title(url)}')
-            print('Можливо потрібно встановити плагін ffmpeg')
-            print(f"Error {type(e).__name__}: {e}")
-            with open(Path(path) / file_name, "w", encoding="utf-8") as file:
-                file.write("")
-
+        print(f"Error {type(e).__name__}: {e}")
+        with open(Path(path) / file_name, "w", encoding="utf-8") as file:
+            file.write("")
 
 def download_thumbnail(url, path):
     file_name = get_title(url) + ".jpg"
