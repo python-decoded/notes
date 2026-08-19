@@ -1,6 +1,7 @@
 from pathlib import Path
 from urllib.request import urlopen
 from functools import lru_cache
+import time
 
 from pytubefix import YouTube, Playlist
 import yt_dlp
@@ -46,6 +47,7 @@ def in_indexes(idx, indexes):
     return False
 
 
+@lru_cache
 def get_title(url):
     if is_playlist(url):
         title = Playlist(url).title
@@ -151,6 +153,9 @@ def download_thumbnail(url, path):
         with open(Path(path) / file_name, "wb") as image:
             image.write(response.read())
 
+    with open(Path(path) / (get_title(url) + ".txt"), "wb") as image:
+        image.write(url)
+
 
 def process_list(url, args):
 
@@ -161,6 +166,7 @@ def process_list(url, args):
     print(f"Завантаження {len(urls)} відео з плейліста: '{get_title(url)}' \nдо папки: {args.download_dir}")
 
     for idx, url in enumerate(urls, start=1):
+        time.sleep(5)
         if in_indexes(idx, args.indexes):
             print(f"{idx}: '{get_title(url)}")
             process_video(url, args)
