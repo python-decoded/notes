@@ -1,6 +1,9 @@
+import string
 import pygame
 import sys
 import random
+
+from pygame._sdl2 import controller
 
 KEYS_LAYOUT = {
     'a': 'ф', 'b': 'и', 'c': 'с', 'd': 'в', 'e': 'у', 'f': 'а', 'g': 'п', 'h': 'р',
@@ -10,8 +13,10 @@ KEYS_LAYOUT = {
 }
 LETTERS = "абвгдеєжзиіїйклмнопрстуфхцчшщьюя".upper()   # sorry ґ
 
+# quick swich to english
+# KEYS_LAYOUT = {}
+# LETTERS = string.ascii_uppercase
 
-# from coord_find import player
 
 # Initialize pygame
 pygame.init()
@@ -90,20 +95,138 @@ class Player(pygame.sprite.Sprite):
         self.image.fill(pygame.color.Color("red"))
 
         self.rect = self.image.get_rect()
+
         self.rect.center = position
+        self.target = position
+        self.speed = 1
 
         self.controller = Controller()
 
         self.letters_near = set()
+        self.shifted_keys = []
 
-    def update(self):
+        self.enter_spells = False
+        self.enter_spell_keys = []
 
-        pressed, holding, released = self.controller.update()
-        # if pressed or holding or released:
-        #     print(pressed, holding, released)
+    def move_to(self, rect, target, speed):
+        """
+        Рухає rect у напрямку target із заданою швидкістю.
+        rect: pygame.Rect (об'єкт, який рухається)
+        target: pygame.Rect або tuple/list (координати цілі, наприклад, [x, y])
+        speed: int або float (швидкість руху)
+        """
+        # 1. Отримуємо точку, куди треба йти (працює і з Rect, і з кортежем типу (x, y))
+        target_pos = pygame.math.Vector2(target.center if hasattr(target, 'center') else target)
+        current_pos = pygame.math.Vector2(rect.center)
 
-        # cells = self.game.grid.get_cells_by_coord(*self.rect.center, distance=100)  # 8 around
-        cells = self.game.grid.get_cells_by_coord(*self.rect.center, distance=70)   # 4 arrount
+        # 2. Рахуємо вектор напрямку та відстань
+        direction = target_pos - current_pos
+        distance = direction.length()
+
+        # 3. Рухаємося, якщо ми ще не в цілі
+        if distance > 0:
+            if distance <= speed:
+                # Якщо ціль ближче, ніж наш крок, просто стаємо в центр цілі
+                rect.center = (round(target_pos.x), round(target_pos.y))
+            else:
+                # Нормалізуємо напрямок (робимо довжину 1) і множимо на швидкість
+                new_pos = current_pos + direction.normalize() * speed
+                # Округляємо та записуємо нові координати в rect
+                rect.center = (round(new_pos.x), round(new_pos.y))
+
+    def update(self, dt: float):
+        """
+        1. update controls
+        2. update player behavior
+        3. process - ENTER state
+        4. process - shift state
+        5. process simple actions - and move to ENTER or SHIFT states if needed
+        """
+
+        self.controller.update()
+
+        if self.rect.center != self.target:
+            self.move_to(self.rect, self.target, self.speed * dt)
+            return
+
+
+        #     self.rect.x = self.target[0]
+        #     return
+
+        # Player UI
+        if self.enter_spells:
+            self.image.fill(pygame.color.Color("green"))
+        elif "shift" in self.controller.holding_keys:
+            self.image.fill(pygame.color.Color("yellow"))
+        else:
+            self.image.fill(pygame.color.Color("red"))
+
+        # Cells in radius
+        cells = self.game.grid.get_cells_by_coord(*self.rect.center, distance=self.game.grid.cell_size * 1.1)
+        for c in self.game.grid.squares_group:
+            if c.rect.center == self.rect.center:
+                c.always_visible = True
+                c.alpha = int(min(255, c.alpha * 2 + 10))
+                c.redraw_sprite((0, 0, 255, c.alpha))
+            elif c in cells:
+                c.always_visible = True
+                c.alpha = int(min(255, c.alpha * 2 + 10))
+                c.redraw_sprite((0, 0, 255, c.alpha))
+            elif c.always_visible is False:
+                c.alpha = int(max(0, c.alpha / 2 - 10))
+                c.redraw_sprite((0, 0, 255, c.alpha))
+            else:
+                c.alpha = int(min(255, c.alpha * 2 + 10))
+                c.redraw_sprite((100, 100, 100, c.alpha))
+
+        # PROCESS SPELLS MODE
+        if self.enter_spells:
+            # go from ENTER MODE
+            if "return" in self.controller.pressed_keys:
+                self.enter_spells = False
+                print("ENTERED MESSAGE: ", self.enter_spell_keys)
+                return
+
+            self.enter_spell_keys.extend(self.controller.pressed_keys)
+            return   #  STILL IN ENTER SPELLS MODE
+
+        # ======================================================
+        # alL further logic is blocked by enter spell mode
+        # it makes sense to introduce some strategy here.
+        # ======================================================
+
+        # ENTER SPELLS MODE
+        if "return" in self.controller.pressed_keys:
+            self.enter_spells = True
+            self.enter_spell_keys = []
+            self.shifted_keys = []  # ignore shifted keys input if in enter spell mode,
+            return
+
+        if "shift" in self.controller.pressed_keys:
+            print("holding shift")
+            self.shifted_keys = []
+            return
+        if "shift" in self.controller.holding_keys:
+            self.shifted_keys.extend(self.controller.pressed_keys)
+            return
+        if "shift" in self.controller.released_keys:
+            print("released shift: ", self.shifted_keys)
+            return
+
+        # ======================================================
+        # alL further logic is blocked by shifted key pressed spell mode
+        # it makes sense to introduce some strategy here.
+        # ======================================================
+
+        # ENTER SPELLS MODE
+        # ENTER SPELLS MODE
+        if "return" in self.controller.pressed_keys:
+            self.enter_spells = True
+            self.enter_spell_keys = []
+            return
+
+        # PROCESS common mode --------------------------------------------------------------------------
+        cells = self.game.grid.get_cells_by_coord(*self.rect.center, distance=self.game.grid.cell_size * 1.1)   # 4 arrount
 
         # DEBUG
         letters_near = {c.letter for c in cells}
@@ -117,7 +240,7 @@ class Player(pygame.sprite.Sprite):
 
             # print(c.letter, self.controller.pressed_keys)
             if c.letter.lower() in self.controller.pressed_keys:
-                self.rect.center = c.rect.center
+                self.target = c.rect.center
 
 
         #     cells = [c for c in self.game.grid.get_cells_by_coord(*self.rect.center, distance=100)
@@ -126,8 +249,13 @@ class Player(pygame.sprite.Sprite):
 
         # self.get_colliding_sprites_with_distances(self.player, self.game)
 
+        # PROCESS common mode ends here ---------------------------------------------------------------------
 
 class SquareWithLetter(pygame.sprite.Sprite):
+
+    letter_size = 0.5
+    always_visible = False
+    alpha = 255
 
     def __init__(self, x, y, square_size):
         super().__init__()
@@ -156,7 +284,7 @@ class SquareWithLetter(pygame.sprite.Sprite):
         pygame.draw.rect(self.image, color, (0, 0, self.square_size, self.square_size))
 
         # Малюємо літеру по центру спрайту
-        font = pygame.font.Font(None, self.square_size)
+        font = pygame.font.Font(None, int(self.square_size * self.letter_size))
         text_surface = font.render(self.letter, True, (255, 255, 255))  # Білий текст
         text_rect = text_surface.get_rect(center=(self.square_size // 2, self.square_size // 2))
 
@@ -228,7 +356,7 @@ class Grid:
 
         if s.letter in neighbor_letters:
             s.letter = random.choice(list(set(LETTERS) - neighbor_letters))
-            s.redraw_sprite((123, 123, 123))
+            # s.redraw_sprite((123, 123, 123))
 
     def prepare_squares(self):
 
@@ -283,11 +411,15 @@ class Grid:
 class Game:
 
     def __init__(self):
-        width, height = 800, 600
+        width, height = 1180, 720
+
+        # self.screen = pygame.display.set_mode((width, height), pygame.FULLSCREEN | pygame.SCALED)
         self.screen = pygame.display.set_mode((width, height))
+
+
         pygame.display.set_caption("Pygame-CE Template")
-        self.grid = Grid(cell_size=60, cols=10, rows=6,
-                         spacing=(10, 10), padding=(10, 20),
+        self.grid = Grid(cell_size=80, cols=12, rows=6,
+                         spacing=(5, 5), padding=(10, 20),
                          h_align="center", v_align="bottom")
 
     def main(self):
@@ -297,10 +429,13 @@ class Game:
         ui = UI(self.screen.height - self.grid.height)
         ui_group = pygame.sprite.Group(ui)
         player = Player(self, random.choice(self.grid.squares_group.sprites()).rect.center)
+        dt = 0
 
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     running = False
 
 
@@ -334,12 +469,12 @@ class Game:
 
             self.grid.update()
 
-            player.update()
+            player.update(dt)
             self.screen.blit(player.image, player.rect)
 
             # Update the display
             pygame.display.flip()
-            clock.tick(60)
+            dt = clock.tick(60)
 
         pygame.quit()
         sys.exit()
@@ -347,4 +482,3 @@ class Game:
 
 if __name__ == "__main__":
     Game().main()
-
