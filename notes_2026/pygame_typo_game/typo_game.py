@@ -94,6 +94,9 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.Surface((50, 50))
         self.image.fill(pygame.color.Color("red"))
 
+        self.picture = pygame.image.load("./src/player.png").convert_alpha()
+        self.picture = pygame.transform.scale(self.picture, (100, 100))
+
         self.rect = self.image.get_rect()
 
         self.rect.center = position
@@ -134,7 +137,7 @@ class Player(pygame.sprite.Sprite):
                 # Округляємо та записуємо нові координати в rect
                 rect.center = (round(new_pos.x), round(new_pos.y))
 
-    def update(self, dt: float):
+    def _update(self, dt: float):
         """
         1. update controls
         2. update player behavior
@@ -250,6 +253,15 @@ class Player(pygame.sprite.Sprite):
         # self.get_colliding_sprites_with_distances(self.player, self.game)
 
         # PROCESS common mode ends here ---------------------------------------------------------------------
+
+    def update(self, dt: float):
+
+        self._update(dt)
+        # screen.blit(player.image, (player.rect.x + player.image_offset_x, player.rect.y + player.image_offset_y))
+
+        # self.game.screen.blit(self.image, self.rect)
+        self.game.screen.blit(self.picture, (self.rect.x - 25, self.rect.y - 45))
+
 
 class SquareWithLetter(pygame.sprite.Sprite):
 
@@ -470,7 +482,6 @@ class Game:
             self.grid.update()
 
             player.update(dt)
-            self.screen.blit(player.image, player.rect)
 
             # Update the display
             pygame.display.flip()
