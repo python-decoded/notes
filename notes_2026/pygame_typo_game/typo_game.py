@@ -22,6 +22,94 @@ LETTERS = "абвгдеєжзиіїйклмнопрстуфхцчшщьюя".upp
 pygame.init()
 
 
+class SurfaceContainer(pygame.sprite.Group):
+    def __init__(self, x, y, width, height, bg = (0, 0, 0)):
+        super().__init__()
+        # Позиція контейнера на головному екрані
+        self.x = x
+        self.y = y
+        self.bg = bg
+
+        # Створюємо окрему поверхню (холст) для цього контейнера
+        self.surface = pygame.Surface((width, height))
+
+        # Додатково: дозволяємо прозорість для нашого холста
+        self.surface.set_colorkey((0, 0, 0))  # Чорний колір стане прозорим
+
+    def draw_to_screen(self, screen):
+        """Малює спрайти всередині контейнера, а потім сам контейнер — на екран."""
+        # 1. Очищаємо внутрішню поверхню перед кожним кадром
+        self.surface.fill(self.bg)
+
+        # Можна намалювати фон для самого контейнера (наприклад, сіра панель)
+        # self.surface.fill((50, 50, 50))
+
+        # 2. Малюємо всі спрайти групи НА ПОВЕРХНЮ КОНТЕЙНЕРА
+        # Оскільки ми передаємо self.surface, координати rect кожного спрайта
+        # рахуються відносно цього холста!
+        super().draw(self.surface)
+
+        # 3. Малюємо саму поверхню контейнера на ГОЛОВНИЙ ЕКРАН
+        screen.blit(self.surface, (self.x, self.y))
+
+class SpellBook:
+    def __init__(self):
+        super().__init__()
+        self.keys = dict.fromkeys(["n", "s", "e",  "w", "ne", "se", "nw", "sw"], "")
+        self.activated = []
+
+        cell_size = 50
+        self.key_icons = {
+            "n": SquareWithLetter(cell_size, 0, cell_size, "A"),
+            "ne": SquareWithLetter(0, 0, cell_size, "A"),
+            "nw": SquareWithLetter(cell_size * 2, 0, cell_size, "A"),
+            "s": SquareWithLetter(cell_size, cell_size * 2, cell_size, "A"),
+            "se": SquareWithLetter(0, cell_size * 2, cell_size, "A"),
+            "sw": SquareWithLetter(cell_size * 2, cell_size * 2, cell_size, "A"),
+            "e": SquareWithLetter(0, cell_size, cell_size, "A"),
+            "w": SquareWithLetter(cell_size * 2, cell_size, cell_size, "A"),
+        }
+        self.group = SurfaceContainer(x=20, y=20, width=cell_size * 3, height=cell_size * 3, bg = (30, 135, 123))
+        self.group.add(*self.key_icons.values())
+
+        for k in self.keys:
+            self.randomize_key(k)
+        print("BOOK AFTER SETUP: ", self.keys)
+
+    def randomize_key(self, key):
+        self.keys[key] = random.choice(list(set(LETTERS) - set(self.keys.values())))
+        self.key_icons[key].letter = self.keys[key]
+        self.key_icons[key].redraw_sprite()
+
+    def reset(self):
+        """
+        Randomize activated keys, and reset all activation
+        """
+        if not self.activated:
+            return
+
+        for d in self.activated:
+            self.randomize_key(d)
+        self.activated = []
+
+        print("BOOK AFTER RESET: ", self.keys)
+
+    def activate(self, letter):
+        for k, v in self.keys.items():
+            if v == letter.upper():
+                self.activated.append(k)
+
+    def get_activated(self):
+        return [k for k, v in self.keys.items() if k in self.activated]
+
+    def update(self):
+        for d, i in self.key_icons.items():
+            if d in self.activated:
+                i.redraw_sprite((39, 30, 30))
+            else:
+                i.redraw_sprite()
+
+
 class UI(pygame.sprite.Sprite):
     def __init__(self, height):
         super().__init__()
@@ -110,6 +198,8 @@ class Player(pygame.sprite.Sprite):
 
         self.enter_spells = False
         self.enter_spell_keys = []
+
+        self.spell_book = SpellBook()
 
     def move_to(self, rect, target, speed):
         """
@@ -208,12 +298,19 @@ class Player(pygame.sprite.Sprite):
         if "shift" in self.controller.pressed_keys:
             print("holding shift")
             self.shifted_keys = []
+            self.spell_book.reset()
             return
         if "shift" in self.controller.holding_keys:
             self.shifted_keys.extend(self.controller.pressed_keys)
+
+            for k in self.controller.pressed_keys:
+                self.spell_book.activate(k)
             return
+
         if "shift" in self.controller.released_keys:
             print("released shift: ", self.shifted_keys)
+            print("ACTIVATED: ", self.spell_book.get_activated())
+            self.spell_book.reset()
             return
 
         # ======================================================
@@ -222,10 +319,11 @@ class Player(pygame.sprite.Sprite):
         # ======================================================
 
         # ENTER SPELLS MODE
-        # ENTER SPELLS MODE
+        # ENTER SPELLS MODE - RESET ALL SHIFTED
         if "return" in self.controller.pressed_keys:
             self.enter_spells = True
             self.enter_spell_keys = []
+            self.spell_book.reset()
             return
 
         # PROCESS common mode --------------------------------------------------------------------------
@@ -257,10 +355,10 @@ class Player(pygame.sprite.Sprite):
     def update(self, dt: float):
 
         self._update(dt)
-        # screen.blit(player.image, (player.rect.x + player.image_offset_x, player.rect.y + player.image_offset_y))
-
-        # self.game.screen.blit(self.image, self.rect)
         self.game.screen.blit(self.picture, (self.rect.x - 25, self.rect.y - 45))
+
+        self.spell_book.update()
+        self.spell_book.group.draw_to_screen(self.game.screen)
 
 
 class SquareWithLetter(pygame.sprite.Sprite):
@@ -269,10 +367,10 @@ class SquareWithLetter(pygame.sprite.Sprite):
     always_visible = False
     alpha = 255
 
-    def __init__(self, x, y, square_size):
+    def __init__(self, x, y, square_size, letter=None):
         super().__init__()
 
-        self.letter = random.choice(LETTERS)
+        self.letter = letter or random.choice(LETTERS)
         self.square_size = square_size
 
         # 1. Створюємо поверхню (полотно) для нашого спрайту
