@@ -12,10 +12,10 @@ class Character:
         self.agility = agility
         self.intelligence = intelligence
 
-        if strength > 5:
-            self.health = 120
-        elif strength > 10:
+        if strength > 10:
             self.health = 150
+        elif strength > 5:
+            self.health = 120
 
         self.attack = 15 * (1 + strength / 100)
         self.crit_chance = 5 + intelligence
